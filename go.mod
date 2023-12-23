@@ -3,7 +3,7 @@ module github.com/adiatma85/new-go-template
 go 1.21
 
 require (
-	github.com/adiatma85/own-go-sdk v0.1.6
+	github.com/adiatma85/own-go-sdk v0.1.7
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
