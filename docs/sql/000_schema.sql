@@ -19,15 +19,15 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE (`username`)
 ) ENGINE = INNODB COMMENT='User table';
 
--- Create Table Urls
--- For example from url shortener
-DROP TABLE IF EXISTS `url`;
-CREATE TABLE IF NOT EXISTS `url` (
+DROP TABLE IF EXISTS `task`;
+CREATE TABLE IF NOT EXISTS `task` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `fk_user_id` INT COMMENT 'Foreign Key to User ID',
-  `original_url` VARCHAR(255) NOT NULL DEFAULT '',
-  `shorten_url` VARCHAR(255) NOT NULL DEFAULT '',
-  `visit` INT NOT NULL DEFAULT '0',
+  `fk_user_id` INT COMMENT 'Foreign Key To User Id',
+  `title` VARCHAR(255) NOT NULL DEFAULT '',
+  `priority` INT NOT NULL DEFAULT 1,
+  `task_status` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'todo, ongoing, done',
+  `periodic` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'none, daily, weekly, monthly, yearly',
+  `due_time` TIMESTAMP,
 
   -- Utility columns
   `status` SMALLINT NOT NULL DEFAULT '1',
@@ -38,4 +38,4 @@ CREATE TABLE IF NOT EXISTS `url` (
   `deleted_at`TIMESTAMP,
   `deleted_by` VARCHAR(255),
   PRIMARY KEY (`id`)
-) ENGINE = INNODB COMMENT='url table';
+) ENGINE = INNODB COMMENT='Task Table';
