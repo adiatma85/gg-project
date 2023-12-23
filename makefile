@@ -1,3 +1,7 @@
+.PHONY: swag-install
+swag-install:
+	@go install github.com/swaggo/swag/cmd/swag@v1.6.7
+
 .PHONY: build
 build:
 	@go build -o ./build/app ./src/cmd
