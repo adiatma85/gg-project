@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"github.com/adiatma85/new-go-template/src/business/domain/task"
 	"github.com/adiatma85/new-go-template/src/business/domain/user"
 	"github.com/adiatma85/own-go-sdk/log"
 	"github.com/adiatma85/own-go-sdk/parser"
@@ -10,6 +11,7 @@ import (
 
 type Domain struct {
 	User user.Interface
+	Task task.Interface
 }
 
 type InitParam struct {
@@ -22,6 +24,7 @@ type InitParam struct {
 func Init(param InitParam) *Domain {
 	domain := &Domain{
 		User: user.Init(user.InitParam{Log: param.Log, Db: param.Db, Json: param.Json, Redis: param.Redis}),
+		// Task: task.Init(task.InitParam{Log: param.Log, Db: param.Db, Json: param.Json, Redis: param.Redis}),
 	}
 
 	return domain
