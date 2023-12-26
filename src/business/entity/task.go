@@ -13,13 +13,13 @@ type Task struct {
 	TaskStatus string    `db:"task_status" json:"taskStatus"`
 	Periodic   string    `db:"periodic" json:"periodic"`
 	DueTime    null.Time `db:"due_time" json:"dueTime"`
-	Status     int64     `db:"status" json:"status"`
-	CreatedAt  null.Time `db:"created_at" json:"createdAt"`
-	CreatedBy  string    `db:"created_by" json:"createdBy"`
-	UpdatedAt  null.Time `db:"updated_at" json:"updatedAt"`
-	UpdatedBy  string    `db:"updated_by" json:"updatedBy"`
-	DeletedAt  null.Time `db:"deleted_at" json:"deletedAt"`
-	DeletedBy  string    `db:"deleted_by" json:"deletedBy"`
+	Status     int64     `db:"status" json:"status" swaggertype:"integer"`
+	CreatedAt  null.Time `db:"created_at" json:"createdAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	CreatedBy  string    `db:"created_by" json:"createdBy" swaggertype:"string"`
+	UpdatedAt  null.Time `db:"updated_at" json:"updatedAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	UpdatedBy  string    `db:"updated_by" json:"updatedBy" swaggertype:"string"`
+	DeletedAt  null.Time `db:"deleted_at" json:"deletedAt,omitempty" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	DeletedBy  string    `db:"deleted_by" json:"deletedBy,omitempty" swaggertype:"string"`
 }
 
 type TaskParam struct {
@@ -31,7 +31,7 @@ type TaskParam struct {
 	TaskStatus null.String `param:"task_status" db:"task_status"`
 	Periodic   null.String `param:"periodic" db:"periodic"`
 	DueTime    null.Time   `param:"due_time" db:"due_time"`
-	Status     null.Int64  `param:"status" db:"status"`
+	Status     null.Int64  `param:"status" db:"status" swaggertype:"string"`
 	PaginationParam
 	QueryOption query.Option
 }
@@ -42,7 +42,8 @@ type CreateTaskParam struct {
 	TaskStatus string      `db:"task_status" json:"taskStatus"`
 	Periodic   null.String `db:"periodic" json:"periodic"`
 	DueTime    null.Time   `db:"due_time" json:"due_time"`
-	Status     null.Int64  `db:"status" json:"status"`
+	Status     null.Int64  `db:"status" json:"status" swaggertype:"string"`
+	CreatedBy  null.String `json:"-" db:"created_by" swaggertype:"string"`
 }
 
 type UpdateTaskParam struct {
@@ -50,6 +51,9 @@ type UpdateTaskParam struct {
 	Priority   int64       `param:"priority" db:"priority" json:"priority"`
 	TaskStatus string      `param:"task_status" db:"task_status" json:"taskStatus"`
 	Periodic   null.String `db:"periodic" param:"periodic" json:"periodic"`
-	DueTime    null.Time   `db:"due_time" json:"dueTime" param: "due_time"`
-	Status     null.Int64  `db:"status" param:"status" json:"status"`
+	DueTime    null.Time   `db:"due_time" json:"dueTime" param:"due_time"`
+	Status     null.Int64  `db:"status" param:"status" json:"status" swaggertype:"string"`
+	UpdatedBy  null.String `db:"updated_by" json:"-" swaggertype:"string"`
+	DeletedAt  null.Time   `db:"deleted_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	DeletedBy  null.String `db:"deleted_by" json:"-" swaggertype:"string"`
 }

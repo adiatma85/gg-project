@@ -36,7 +36,7 @@ func (t *task) getCache(ctx context.Context, key string) (entity.Task, error) {
 	return result, t.json.Unmarshal(data, &result)
 }
 
-func (t *task) deleteUserCache(ctx context.Context) error {
+func (t *task) deleteTaskCache(ctx context.Context) error {
 	if err := t.redis.Del(ctx, deleteTaskPattern); err != nil {
 		return errors.NewWithCode(codes.CodeCacheDeleteSimpleKey, "delete cache by keys pattern")
 	}

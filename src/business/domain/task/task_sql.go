@@ -121,4 +121,26 @@ func (t *task) getSQLTaskList(ctx context.Context, params entity.TaskParam) ([]e
 	return tasks, &pg, nil
 }
 
-// func (t *task) updateSQLUser(ctx context.Context, updateParam entity.)
+func (t *task) updateSQLTask(ctx context.Context, updateParam entity.UpdateTaskParam, selectParam entity.TaskParam) error {
+	t.log.Debug(ctx, fmt.Sprintf("update task by : %v", selectParam))
+
+	qb := query.NewSQLQueryBuilder(t.db, "param", "db", &selectParam.QueryOption)
+
+	var err error
+	queryUpdate, args, err := qb.BuildUpdate(&updateParam, &selectParam)
+	if err != nil {
+		return errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
+	}
+	_, err = t.db.Leader().Exec(ctx, "tValue", updateTask+queryUpdate, args...)
+	if err != nil {
+		return errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
+	}
+
+	t.log.Debug(ctx, fmt.Sprintf("successfully update task: %v", updateParam))
+
+	if err := t.deleteTaskCache(ctx); err != nil {
+		t.log.Error(ctx, err)
+	}
+
+	return nil
+}

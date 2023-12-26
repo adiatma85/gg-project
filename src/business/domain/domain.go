@@ -24,7 +24,7 @@ type InitParam struct {
 func Init(param InitParam) *Domain {
 	domain := &Domain{
 		User: user.Init(user.InitParam{Log: param.Log, Db: param.Db, Json: param.Json, Redis: param.Redis}),
-		// Task: task.Init(task.InitParam{Log: param.Log, Db: param.Db, Json: param.Json, Redis: param.Redis}),
+		Task: task.Init(task.InitParam{Log: param.Log, Db: param.Db, Json: param.Json, Redis: param.Redis}),
 	}
 
 	return domain
