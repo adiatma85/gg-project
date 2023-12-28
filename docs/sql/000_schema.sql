@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE (`username`)
 ) ENGINE = INNODB COMMENT='User table';
 
+-- Create Task Table
 DROP TABLE IF EXISTS `task`;
 CREATE TABLE IF NOT EXISTS `task` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -39,3 +40,20 @@ CREATE TABLE IF NOT EXISTS `task` (
   `deleted_by` VARCHAR(255),
   PRIMARY KEY (`id`)
 ) ENGINE = INNODB COMMENT='Task Table';
+
+-- Create Category Table
+DROP TABLE IF EXISTS `category`;
+CREATE TABLE IF NOT EXISTS `category` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL DEFAULT '',
+
+  -- Utility columns
+  `status` SMALLINT NOT NULL DEFAULT '1',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` VARCHAR(255),
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `updated_by` VARCHAR(255),
+  `deleted_at`TIMESTAMP,
+  `deleted_by` VARCHAR(255),
+  PRIMARY KEY (`id`)
+) ENGINE = INNODB COMMENT='Category Table';
