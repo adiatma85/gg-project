@@ -4,14 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/adiatma85/new-go-template/src/business/entity"
+	"github.com/adiatma85/gg-project/src/business/entity"
 	"github.com/adiatma85/own-go-sdk/codes"
 	"github.com/adiatma85/own-go-sdk/errors"
 )
 
 const (
-	getUserByIdKey    = `aquahero:user:get:%s`
-	deleteUserPattern = `aquahero:user:*`
+	getUserByIdKey    = `gg-be:user:get:%s`
+	deleteUserPattern = `gg-be:user:*`
 )
 
 func (u *user) upsertCache(ctx context.Context, key string, value entity.User, expTime time.Duration) error {

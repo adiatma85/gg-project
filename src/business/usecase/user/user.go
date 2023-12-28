@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	userDom "github.com/adiatma85/new-go-template/src/business/domain/user"
-	"github.com/adiatma85/new-go-template/src/business/entity"
+	userDom "github.com/adiatma85/gg-project/src/business/domain/user"
+	"github.com/adiatma85/gg-project/src/business/entity"
 	"github.com/adiatma85/own-go-sdk/codes"
 	"github.com/adiatma85/own-go-sdk/errors"
 	"github.com/adiatma85/own-go-sdk/jwtAuth"

@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/adiatma85/new-go-template/docs/swagger"
-	"github.com/adiatma85/new-go-template/src/business/usecase"
-	"github.com/adiatma85/new-go-template/utils/config"
+	"github.com/adiatma85/gg-project/docs/swagger"
+	"github.com/adiatma85/gg-project/src/business/usecase"
+	"github.com/adiatma85/gg-project/utils/config"
 	"github.com/adiatma85/own-go-sdk/appcontext"
 	"github.com/adiatma85/own-go-sdk/instrument"
 	"github.com/adiatma85/own-go-sdk/jwtAuth"

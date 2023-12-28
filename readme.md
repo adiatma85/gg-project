@@ -70,12 +70,20 @@ Project Structure and Explanation is below:
 1. Make sure you have golang installed on your machine
 2. Run the docker compose to run some container like Redis and MySQL DB
 3. Make your config file
-4. Start the app with command (Linux or MAC) / in windows, you can read reference how to have ``make`` command either using ``WSL`` or ``git bash``
+4. If you running on windows OS, makse sure to install ``make`` command API on your system. This will make your life easier. After that, you can run command:
+   ```bash
+   $ make swaggo
+   ```
+
+   this command will install ``swaggo`` a package to make an interface to access your endpoint in back end services.
+
+5. Start the app with command (Linux or MAC) / in windows, you can read reference how to have ``make`` command either using ``WSL`` or ``git bash``
 
    ```bash
    $ make run
    ```
-5. The app is running on port ``8080`` (Default). If running, you will something like this on your terminal:
+6. The app is running on port ``8080`` (Default). If running, you will something like this on your terminal:
 
 ![Alt text](./etc/images/running_terminal.png)
 
+7. You can access the swagger endpoint in `{host}:{port}/swagger/index.html`

@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"github.com/adiatma85/new-go-template/src/business/domain/task"
-	"github.com/adiatma85/new-go-template/src/business/domain/user"
+	"github.com/adiatma85/gg-project/src/business/domain/task"
+	"github.com/adiatma85/gg-project/src/business/domain/user"
 	"github.com/adiatma85/own-go-sdk/log"
 	"github.com/adiatma85/own-go-sdk/parser"
 	"github.com/adiatma85/own-go-sdk/redis"
