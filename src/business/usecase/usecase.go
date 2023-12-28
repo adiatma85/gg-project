@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"github.com/adiatma85/new-go-template/src/business/domain"
-	"github.com/adiatma85/new-go-template/src/business/usecase/user"
+	"github.com/adiatma85/gg-project/src/business/domain"
+	"github.com/adiatma85/gg-project/src/business/usecase/user"
 	"github.com/adiatma85/own-go-sdk/jwtAuth"
 	"github.com/adiatma85/own-go-sdk/log"
 )

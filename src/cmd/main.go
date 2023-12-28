@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/adiatma85/new-go-template/src/business/domain"
-	"github.com/adiatma85/new-go-template/src/business/usecase"
-	"github.com/adiatma85/new-go-template/src/handler"
-	"github.com/adiatma85/new-go-template/utils/config"
+	"github.com/adiatma85/gg-project/src/business/domain"
+	"github.com/adiatma85/gg-project/src/business/usecase"
+	"github.com/adiatma85/gg-project/src/handler"
+	"github.com/adiatma85/gg-project/utils/config"
 	"github.com/adiatma85/own-go-sdk/configreader"
 	"github.com/adiatma85/own-go-sdk/instrument"
 	"github.com/adiatma85/own-go-sdk/jwtAuth"

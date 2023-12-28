@@ -1,4 +1,4 @@
-module github.com/adiatma85/new-go-template
+module github.com/adiatma85/gg-project
 
 go 1.21
 
