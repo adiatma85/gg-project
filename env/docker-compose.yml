@@ -28,6 +28,7 @@ services:
       - "./storage/mysql/data:/var/lib/mysql"
     environment:
       MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: gg_project
       MYSQL_TCP_PORT: 3306
 
   redis:
