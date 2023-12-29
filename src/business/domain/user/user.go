@@ -63,7 +63,7 @@ func (u *user) Create(ctx context.Context, userParam entity.CreateUserParam) (en
 		return user, errors.NewWithCode(codes.CodeSQLTxCommit, err.Error())
 	}
 
-	if err := u.deleteUserCache(ctx); err != nil {
+	if err := u.deleteCache(ctx); err != nil {
 		u.log.Error(ctx, err)
 	}
 

@@ -44,14 +44,14 @@ func (u *user) getSQLUser(ctx context.Context, params entity.UserParam) (entity.
 		return user, nil
 	}
 
-	cachedUser, err := u.getCache(ctx, fmt.Sprintf(getUserByIdKey, string(key)))
+	cachedEntry, err := u.getCache(ctx, fmt.Sprintf(getUserByIdKey, string(key)))
 	switch {
 	case errors.Is(err, redis.Nil):
 		u.log.Info(ctx, fmt.Sprintf(entity.ErrorRedisNil, err.Error()))
 	case err != nil:
 		u.log.Error(ctx, fmt.Sprintf(entity.ErrorRedis, err.Error()))
 	default:
-		return cachedUser, nil
+		return cachedEntry, nil
 	}
 
 	qb := query.NewSQLQueryBuilder(u.db, "param", "db", &params.QueryOption)
@@ -139,7 +139,7 @@ func (u *user) updateSQLUser(ctx context.Context, updateParam entity.UpdateUserP
 
 	u.log.Debug(ctx, fmt.Sprintf("successfully updated user: %v", updateParam))
 
-	if err := u.deleteUserCache(ctx); err != nil {
+	if err := u.deleteCache(ctx); err != nil {
 		u.log.Error(ctx, err)
 	}
 

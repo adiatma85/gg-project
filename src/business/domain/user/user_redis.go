@@ -15,28 +15,28 @@ const (
 )
 
 func (u *user) upsertCache(ctx context.Context, key string, value entity.User, expTime time.Duration) error {
-	user, err := u.json.Marshal(value)
+	entry, err := u.json.Marshal(value)
 	if err != nil {
 		return err
 	}
 
-	return u.redis.SetEX(ctx, key, string(user), expTime)
+	return u.redis.SetEX(ctx, key, string(entry), expTime)
 }
 
 func (u *user) getCache(ctx context.Context, key string) (entity.User, error) {
 	var result entity.User
 
-	user, err := u.redis.Get(ctx, key)
+	entry, err := u.redis.Get(ctx, key)
 	if err != nil {
 		return result, err
 	}
 
-	data := []byte(user)
+	data := []byte(entry)
 
 	return result, u.json.Unmarshal(data, &result)
 }
 
-func (u *user) deleteUserCache(ctx context.Context) error {
+func (u *user) deleteCache(ctx context.Context) error {
 	if err := u.redis.Del(ctx, deleteUserPattern); err != nil {
 		return errors.NewWithCode(codes.CodeCacheDeleteSimpleKey, "delete cache by keys pattern")
 	}

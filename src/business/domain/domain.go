@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"github.com/adiatma85/gg-project/src/business/domain/category"
 	"github.com/adiatma85/gg-project/src/business/domain/user"
 	"github.com/adiatma85/own-go-sdk/log"
 	"github.com/adiatma85/own-go-sdk/parser"
@@ -9,7 +10,8 @@ import (
 )
 
 type Domain struct {
-	User user.Interface
+	User     user.Interface
+	Category category.Interface
 }
 
 type InitParam struct {
@@ -21,7 +23,8 @@ type InitParam struct {
 
 func Init(param InitParam) *Domain {
 	domain := &Domain{
-		User: user.Init(user.InitParam{Log: param.Log, Db: param.Db, Json: param.Json, Redis: param.Redis}),
+		User:     user.Init(user.InitParam{Log: param.Log, Db: param.Db, Json: param.Json, Redis: param.Redis}),
+		Category: category.Init(category.InitParam{Log: param.Log, Db: param.Db, Json: param.Json, Redis: param.Redis}),
 	}
 
 	return domain

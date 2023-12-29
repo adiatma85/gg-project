@@ -31,7 +31,7 @@ func (u *User) ConvertToAuthUser() jwtAuth.User {
 
 type UserParam struct {
 	ID          null.Int64  `param:"id" uri:"user_id" db:"id" form:"id"`
-	IDs         []int64     `param:"ids" uri:"user_ids" db:"id"`
+	IDs         []int64     `param:"ids" uri:"user_ids" db:"id" form:"userIds"`
 	Email       null.String `param:"email" db:"email"`
 	Username    null.String `param:"username" db:"username"`
 	DisplayName null.String `param:"display_name" db:"display_name"`
@@ -52,10 +52,11 @@ type UpdateUserParam struct {
 	Username    string      `param:"username" db:"username" json:"username"`
 	DisplayName string      `param:"display_name" db:"display_name" json:"displayName"`
 	Password    string      `param:"password" db:"password" json:"password"`
-	Status      null.Int64  `db:"status" json:"-" swaggertype:"integer"`
-	UpdatedBy   null.String `db:"updated_by" json:"-" swaggertype:"string"`
-	DeletedAt   null.Time   `db:"deleted_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
-	DeletedBy   null.String `db:"deleted_by" json:"-" swaggertype:"string"`
+	Status      null.Int64  `param:"status" db:"status" json:"-" swaggertype:"integer"`
+	UpdatedAt   null.Time   `param:"updated_at" db:"updated_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	UpdatedBy   null.String `param:"updated_by" db:"updated_by" json:"-" swaggertype:"string"`
+	DeletedAt   null.Time   `param:"deleted_at" db:"deleted_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	DeletedBy   null.String `param:"deleted_by" db:"deleted_by" json:"-" swaggertype:"string"`
 }
 
 type UserLoginRequest struct {
