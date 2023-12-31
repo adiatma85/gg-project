@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+
+  # Caddy in here
+  caddy:
+    image: 'adiatma85/caddy-micro-udemy:1.0.5'
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+  
+  # Mysql
+  mysql:
+    image: mysql:8.0.26
+    ports:
+      - "3306:3306"
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: gg_project
+      MYSQL_TCP_PORT: 3306
+    volumes:
+      - "./storage/mysql/scripts:/docker-entrypoint-initdb.d"
+      - "./storage/mysql/data:/var/lib/mysql"
+  
+  # Redis
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 1
+    entrypoint:
+      - "redis-server"
+    volumes:
+      - "./storage/redis/conf:/usr/lib/redis/conf"
+      - "./storage/redis/modules:/usr/lib/redis/modules"
+      - "./storage/redis/data:/data"
+
+  # Main application in here
+  gg-project:
+    image: adiatma85/gg-project:latest
+    ports:
+      - "8080:8080"
+    deploy:
+      mode: replicated
+      replicas: 1
+    

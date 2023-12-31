@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Get User List
-// @Description Get list all user
+// @Summary Get User List as an Admin
+// @Description Get list all user Get User List as an Admin
 // @Security BearerAuth
 // @Tags Admin
 // @Param limit query integer false "limit"
@@ -17,7 +17,7 @@ import (
 // @Success 200 {object} entity.HTTPResp{data=[]entity.User{}}
 // @Failure 500 {object} entity.HTTPResp{}
 // @Router /v1/admin/user [GET]
-func (r *rest) GetListUser(ctx *gin.Context) {
+func (r *rest) GetListUserAsAdmin(ctx *gin.Context) {
 	var param entity.UserParam
 	if err := r.BindParams(ctx, &param); err != nil {
 		r.httpRespError(ctx, err)

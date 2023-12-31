@@ -180,7 +180,14 @@ func (r *rest) Register() {
 	v1.DELETE("/user/:user_id", r.DeleteUser)
 
 	// user management admin api
-	v1.GET("/admin/user", r.GetListUser)
+	v1.GET("/admin/user", r.GetListUserAsAdmin)
+
+	// category
+	v1.GET("/category", r.GetListCategory)
+	v1.POST("/category", r.CreateCategory)
+	v1.GET("/category/:category_id", r.GetCategoryByID)
+	v1.PUT("/category/:category_id", r.UpdateCategory)
+	v1.DELETE("/category/:category_id", r.DeleteCategory)
 }
 
 func (r *rest) registerSwaggerRoutes() {
