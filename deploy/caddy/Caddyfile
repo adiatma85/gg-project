@@ -22,5 +22,5 @@
 }
 
 backend:80 {
-	reverse_proxy http://gg-project:80
+	reverse_proxy http://gg-project:8080
 }

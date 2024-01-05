@@ -2,14 +2,14 @@
     "Meta": {
         "Title": "Go-Template",
         "Description": "New Template for Golang",
-        "Host": "localhost:8080",
+        "Host": "{{ HOST }}",
         "Basepath": "/",
         "Version": ""
     },
     "Gin": {
-        "Host": "localhost",
-        "Port": "8080",
-        "Mode": "debug",
+        "Host": "{{ HOST }}",
+        "Port": "{{ PORT }}",
+        "Mode": "{{ ENV_MODE }}",
         "Timeout": "1000s",
         "ShutdownTimeout": "10s",
         "LogRequest": "true",
@@ -65,13 +65,13 @@
     "SQL": {
         "UseInstrument": "true",
         "LogQuery": "true",
-        "Driver": "mysql",
+        "Driver": "{{ DATABASE_DRIVER }}",
         "Follower": {
-            "Host": "127.0.0.1",
-            "Port": "3306",
-            "DB": "template_db",
-            "User": "root",
-            "Password": "root",
+            "Host": "{{ DATABASE_HOST }}",
+            "Port": "{{ DATABASE_PORT }}",
+            "DB": "{{ DATABASE_NAME }}",
+            "User": "{{ DATABASE_USER }}",
+            "Password": "{{ DATABASE_PASSWORD }}",
             "SSL": null,
             "Schema": null,
             "Options": {
@@ -81,11 +81,11 @@
              }
         },
         "Leader": {
-            "Host": "127.0.0.1",
-            "Port": "3306",
-            "DB": "template_db",
-            "User": "root",
-            "Password": "root",
+            "Host": "{{ DATABASE_HOST }}",
+            "Port": "{{ DATABASE_PORT }}",
+            "DB": "{{ DATABASE_NAME }}",
+            "User": "{{ DATABASE_USER }}",
+            "Password": "{{ DATABASE_PASSWORD }}",
             "SSL": null,
             "Schema": null,
             "Options": {
@@ -119,6 +119,6 @@
     "JwtAuth": {
         "AccessTokenExpLimit": "1h",
         "RefreshTokenExpLimit": "168h",
-        "Secret": "秘密"
+        "Secret": "{{ APP_SECRET }}"
     }
 }
