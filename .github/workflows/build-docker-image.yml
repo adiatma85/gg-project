@@ -28,6 +28,27 @@ jobs:
         with:
           go-version: 1.21
           cache: true
+      
+      - name: Make secret file
+        run: |
+          echo '{
+            "HOST": "${{ secrets.HOST }}",
+            "PORT": "${{ secrets.PORT }}",
+            "ENV_MODE": "${{ secrets.ENV_MODE }}",
+            "DATABASE_HOST": "${{ secrets.DATABASE_HOST }}",
+            "DATABASE_PORT": "${{ secrets.DATABASE_PORT }}",
+            "DATABASE_USER": "${{ secrets.DATABASE_USER }}",
+            "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
+            "DATABASE_DRIVER": "${{ secrets.DATABASE_DRIVER }}"
+          }' >> secrets.json
+        shell: bash
+
+      - name: Render the secret with Template File
+        run: |
+          go install github.com/cbroglie/mustache/cmd/mustache@v1.4.0
+          touch ./etc/cfg/conf.json
+          mustache --layout ./etc/tpl/conf.template.json secrets.json ./etc/cfg/conf.json >> ./etc/cfg/conf.json
+          rm secrets.json
 
       - name: Build Go App for Docker
         id: build
@@ -52,6 +73,14 @@ jobs:
 
       - name: Check Semver Format
         run: ./utils/semver -v ${{ steps.bump-semver.outputs.new_version }}
+      
+      - name: Create Release Notes
+        id: create-release
+        run: |
+          curl -f -X POST -H "Accept: application/vnd.github.v3+json" \
+            -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            -d '{"tag_name":"${{ steps.bump-semver.outputs.new_version }}", "prerelease":true, "generate_release_notes":true}'
 
       - name: Build and push Docker image
         env:
