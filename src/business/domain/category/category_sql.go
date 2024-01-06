@@ -80,16 +80,16 @@ func (c *category) getSQLCategory(ctx context.Context, params entity.CategoryPar
 	return category, nil
 }
 
-func (u *category) getSQLCategoryList(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error) {
+func (c *category) getSQLCategoryList(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error) {
 	categories := []entity.Category{}
 
-	qb := query.NewSQLQueryBuilder(u.db, "param", "db", &params.QueryOption)
+	qb := query.NewSQLQueryBuilder(c.db, "param", "db", &params.QueryOption)
 	queryExt, queryArgs, countExt, countArgs, err := qb.Build(&params)
 	if err != nil {
 		return categories, nil, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	rows, err := u.db.Follower().Query(ctx, "rListCategory", getCategory+queryExt, queryArgs...)
+	rows, err := c.db.Follower().Query(ctx, "rListCategory", getCategory+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return categories, nil, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	}
@@ -99,7 +99,7 @@ func (u *category) getSQLCategoryList(ctx context.Context, params entity.Categor
 	for rows.Next() {
 		temp := entity.Category{}
 		if err := rows.StructScan(&temp); err != nil {
-			u.log.Error(ctx, errors.NewWithCode(codes.CodeSQLRowScan, err.Error()))
+			c.log.Error(ctx, errors.NewWithCode(codes.CodeSQLRowScan, err.Error()))
 			continue
 		}
 		categories = append(categories, temp)
@@ -111,7 +111,7 @@ func (u *category) getSQLCategoryList(ctx context.Context, params entity.Categor
 	}
 
 	if len(categories) > 0 && !params.QueryOption.DisableLimit && params.IncludePagination {
-		if err := u.db.Follower().Get(ctx, "cCategory", readCategoryCount+countExt, &pg.TotalElements, countArgs...); err != nil {
+		if err := c.db.Follower().Get(ctx, "cCategory", readCategoryCount+countExt, &pg.TotalElements, countArgs...); err != nil {
 			return categories, nil, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 		}
 	}
