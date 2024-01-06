@@ -1,0 +1,64 @@
+name: "Staging: Build & Deploy"
+
+concurrency:
+  group: build-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+env:
+  DOCKERHUB_REPOSITORY: adiatma85/gg-project
+
+jobs:
+  build_deploy:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v3.3.1
+        with:
+          go-version: 1.21
+          cache: true
+
+      - name: Build Go App for Docker
+        id: build
+        run: |
+          make prepare
+          make build-alpine
+
+      - name: Get Latest Tag
+        id: latest-tag
+        run: |
+          git config --global --add safe.directory /github/workspace
+          echo "tag=$(git tag -l | grep -v -E '^.*-hotfix\..*$' | sed '/-/!{s/$/_/;}' \
+            | sort -V | sed 's/_$//' | tail -1)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate New Bumped Version
+        uses: DelosAqua/action-bump-semver@v1.1.0
+        id: bump-semver
+        with:
+          current_version: ${{ steps.latest-tag.outputs.tag }}
+          level: prerelease
+          preid: rc
+
+      - name: Check Semver Format
+        run: ./utils/semver -v ${{ steps.bump-semver.outputs.new_version }}
+
+      - name: Build and push Docker image
+        env:
+          DOCKER_IMAGE: ${{ env.DOCKERHUB_REPOSITORY }}:${{ steps.bump-semver.outputs.new_version }}
+        run: |
+          docker buildx create --use
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker buildx build . -f ./utils/Dockerfile -t ${{ env.DOCKER_IMAGE }} \
+            --build-arg SERVICE_VERSION=${{ steps.bump-semver.outputs.new_version }} \
+            --provenance false --push
