@@ -1,34 +1,37 @@
-name: "Staging: Build & Deploy"
-
-concurrency:
-  group: build-deploy-${{ github.ref }}
-  cancel-in-progress: true
+name: "Production: Release"
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - develop
+    inputs:
+      versionbump:
+        description: "Version Bump"
+        type: choice
+        required: true
+        options:
+          - "patch"
+          - "minor"
+          - "major"
 
 env:
   DOCKERHUB_REPOSITORY: adiatma85/gg-project
 
+
 jobs:
-  build_deploy:
+  release:
     timeout-minutes: 30
     runs-on: ubuntu-latest
-
+  
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
+      
       - name: Setup Go environment
         uses: actions/setup-go@v3.3.1
         with:
           go-version: 1.21
           cache: true
-      
+
       - name: Make secret file
         run: |
           echo '{
@@ -49,13 +52,13 @@ jobs:
           touch ./etc/cfg/conf.json
           mustache --layout ./etc/tpl/conf.template.json secrets.json ./etc/cfg/conf.json >> ./etc/cfg/conf.json
           rm secrets.json
-
+      
       - name: Build Go App for Docker
         id: build
         run: |
           make prepare
           make build-alpine
-
+      
       - name: Get Latest Tag
         id: latest-tag
         run: |
@@ -63,13 +66,19 @@ jobs:
           echo "tag=$(git tag -l | grep -v -E '^.*-hotfix\..*$' | sed '/-/!{s/$/_/;}' \
             | sort -V | sed 's/_$//' | tail -1)" >> "$GITHUB_OUTPUT"
 
+      - name: Check Prerelease Version
+        run: |
+          if ! [[ ${{ steps.latest-tag.outputs.tag }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+\-rc\.[0-9]+$ ]]; then
+            echo "Invalid Prerelease Version"
+            exit 1
+          fi
+      
       - name: Generate New Bumped Version
         uses: DelosAqua/action-bump-semver@v1.1.0
         id: bump-semver
         with:
           current_version: ${{ steps.latest-tag.outputs.tag }}
-          level: prerelease
-          preid: rc
+          level: ${{ github.event.inputs.versionbump }}
 
       - name: Check Semver Format
         run: ./utils/semver -v ${{ steps.bump-semver.outputs.new_version }}
