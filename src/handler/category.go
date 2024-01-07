@@ -123,7 +123,7 @@ func (r *rest) UpdateCategory(ctx *gin.Context) {
 // @Produce json
 // @Success 200 {object} entity.HTTPResp{data=entity.Category{}}
 // @Failure 500 {object} entity.HTTPResp{}
-// @Router /v1/cateogry/{cateogry_id} [DELETE]
+// @Router /v1/category/{category_id} [DELETE]
 func (r *rest) DeleteCategory(ctx *gin.Context) {
 	var selectParam entity.CategoryParam
 	if err := r.BindParams(ctx, &selectParam); err != nil {

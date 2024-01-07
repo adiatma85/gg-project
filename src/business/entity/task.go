@@ -24,7 +24,7 @@ type Task struct {
 }
 
 type TaskParam struct {
-	ID         null.Int64  `param:"id" uri:"task_id" db:"id" form:"id"`
+	ID         null.Int64  `param:"id" uri:"task_id" db:"id" form:"task_id"`
 	IDs        []int64     `param:"ids" uri:"task_ids" db:"id"`
 	UserId     null.Int64  `param:"fk_user_id" uri:"user_id" db:"fk_user_id"`
 	CategoryID null.Int64  `param:"fk_category_id" uri:"category_id" db:"fk_category_id"`

@@ -188,6 +188,14 @@ func (r *rest) Register() {
 	v1.GET("/category/:category_id", r.GetCategoryByID)
 	v1.PUT("/category/:category_id", r.UpdateCategory)
 	v1.DELETE("/category/:category_id", r.DeleteCategory)
+
+	// task
+	v1.GET("/task", r.GetListTask)
+	v1.POST("/task", r.CreateTask)
+	v1.GET("/user/task/:user_id", r.GetListTaskWithUserId)
+	v1.GET("/task/:task_id", r.GetTaskById)
+	v1.PUT("/task/:task_id", r.UpdateTask)
+	v1.DELETE("/task/:task_id", r.DeleteTask)
 }
 
 func (r *rest) registerSwaggerRoutes() {
