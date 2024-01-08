@@ -101,6 +101,28 @@ jobs:
             -H "authorization: Bearer ${{ secrets.TOKEN_GITHUB }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d '{"tag_name":"${{ steps.bump-semver.outputs.new_version }}", "generate_release_notes":true}'
+
+      # Below is for notification
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v34
+        with:
+          separator: "----------------------"
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+      - uses: benjlevesque/short-sha@v2.1
+        id: short-sha
+        with:
+          length: 7
+      - run: echo $SHA
+        env: 
+          SHA: ${{ steps.short-sha.outputs.sha }}
+      - run: echo $SHA
+        env: 
+          SHA: ${{ env.SHA }}
       
       - name: Discord notification
         env:
