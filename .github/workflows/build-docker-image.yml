@@ -39,7 +39,8 @@ jobs:
             "DATABASE_PORT": "${{ secrets.DATABASE_PORT }}",
             "DATABASE_USER": "${{ secrets.DATABASE_USER }}",
             "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
-            "DATABASE_DRIVER": "${{ secrets.DATABASE_DRIVER }}"
+            "DATABASE_DRIVER": "${{ secrets.DATABASE_DRIVER }}",
+            "REDIS_HOST": "${{ secrets.REDIS_HOST }}"
           }' >> secrets.json
         shell: bash
 
