@@ -96,6 +96,20 @@ jobs:
       - name: Discord notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: ${{ secrets.DISCORD_USERNAME }}
+          DISCORD_AVATAR: ${{ secrets.DISCORD_AVATAR }}
+          DISCORD_EMBEDS: '{
+              "embeds": [{
+                "title": "New Commit on {{ github.repository }}"
+                "author": {
+                  "name": "${{ github.event.pull_request.user.login }}",
+                  "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}",
+                  "icon_url": "${{ github.event.pull_request.user.avatar_url }}"
+                },
+                "description": "[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) ${{ github.event.pull_request.title }}",
+                "footer": "Docker image has ben built and pushed to dockerhub"
+              }]
+            }'
         uses: Ilshidur/action-discord@master
         with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been built.'
+          args: 'The project {{ github.repository }} has been built.'
