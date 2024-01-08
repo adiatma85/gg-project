@@ -3,17 +3,17 @@ version: '3'
 services:
 
   # Caddy in here
-  caddy:
-    image: 'adiatma85/caddy-gg:v1.1'
-    deploy:
-      mode: replicated
-      replicas: 1
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./caddy_data:/data
-      - ./caddy_config:/config
+  # caddy:
+  #   image: 'adiatma85/caddy-gg:v1.1'
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./caddy_data:/data
+  #     - ./caddy_config:/config
   
   # Redis
   redis:
@@ -33,10 +33,9 @@ services:
 
   # Main application in here
   gg-project:
-    image: adiatma85/gg-project:v1.3
+    image: adiatma85/gg-project:v1.0.2-rc.2
     depends_on:
       - redis
-      - mysql
     ports:
       - "8080:8080"
     deploy:

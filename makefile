@@ -18,7 +18,7 @@ build:
 .PHONY: build-alpine
 build-alpine:
 	@go mod tidy && \
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./build/app ./src/cmd
+	go build -o ./build/app ./src/cmd
 
 .PHONY: run
 run: swaggo build
