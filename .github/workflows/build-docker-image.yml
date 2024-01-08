@@ -100,7 +100,7 @@ jobs:
           DISCORD_AVATAR: ${{ secrets.DISCORD_AVATAR }}
           DISCORD_EMBEDS: '{
               "embeds": [{
-                "title": "New Commit on ${{ github.repository }}"
+                "title": "New Commit on ${{ github.repository }}",
                 "author": {
                   "name": "${{ github.event.pull_request.user.login }}",
                   "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}",
