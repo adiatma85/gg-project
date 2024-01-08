@@ -33,7 +33,7 @@ services:
 
   # Main application in here
   gg-project:
-    image: adiatma85/gg-project:v1.0.2-rc.2
+    image: adiatma85/gg-project:v1.0.2-rc.6
     depends_on:
       - redis
     ports:

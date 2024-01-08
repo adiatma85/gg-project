@@ -42,7 +42,8 @@ jobs:
             "DATABASE_PORT": "${{ secrets.DATABASE_PORT }}",
             "DATABASE_USER": "${{ secrets.DATABASE_USER }}",
             "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
-            "DATABASE_DRIVER": "${{ secrets.DATABASE_DRIVER }}"
+            "DATABASE_DRIVER": "${{ secrets.DATABASE_DRIVER }}",
+            "REDIS_HOST": "${{ secrets.REDIS_HOST }}"
           }' >> secrets.json
         shell: bash
 
@@ -99,7 +100,7 @@ jobs:
           curl -f -X POST -H "Accept: application/vnd.github.v3+json" \
             -H "authorization: Bearer ${{ secrets.TOKEN_GITHUB }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
-            -d '{"tag_name":"${{ steps.bump-semver.outputs.new_version }}", "prerelease":true, "generate_release_notes":true}'
+            -d '{"tag_name":"${{ steps.bump-semver.outputs.new_version }}", "generate_release_notes":true}'
       
       - name: Discord notification
         env:
