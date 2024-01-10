@@ -125,8 +125,6 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_FILE }}
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-            docker pull ${{ steps.app-docker-build.outputs.docker_image }}
-            docker pull ${{ steps.caddy-docker-build.outputs.docker_image }}
             docker compose down
             docker compose up -d
             docker system prune --volumes -af
