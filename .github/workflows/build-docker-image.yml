@@ -12,6 +12,7 @@ on:
 
 env:
   DOCKERHUB_REPOSITORY: adiatma85/gg-project
+  CADDY_DOCKERHUB_REPO: adiatma85/caddy-gg
 
 jobs:
   build_deploy:
@@ -40,7 +41,8 @@ jobs:
             "DATABASE_USER": "${{ secrets.DATABASE_USER }}",
             "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
             "DATABASE_DRIVER": "${{ secrets.DATABASE_DRIVER }}",
-            "REDIS_HOST": "${{ secrets.REDIS_HOST }}"
+            "REDIS_HOST": "${{ secrets.REDIS_HOST }}",
+            "CADDY_HOST_NAME": "${{ secrets.CADDY_HOST_NAME }}"
           }' >> secrets.json
         shell: bash
 
@@ -49,6 +51,8 @@ jobs:
           go install github.com/cbroglie/mustache/cmd/mustache@v1.4.0
           touch ./etc/cfg/conf.json
           mustache --layout ./etc/tpl/conf.template.json secrets.json ./etc/cfg/conf.json >> ./etc/cfg/conf.json
+          echo -n > ./deploy/caddy/Caddyfile
+          mustache --layout ./deploy/caddy/Caddyfile.template secrets.json ./deploy/caddy/Caddyfile >> ./deploy/caddy/Caddyfile
           rm secrets.json
 
       - name: Build Go App for Docker
@@ -76,6 +80,7 @@ jobs:
         run: ./utils/semver -v ${{ steps.bump-semver.outputs.new_version }}
       
       - name: Build and push Docker image
+        id: app-docker-build
         env:
           DOCKER_IMAGE: ${{ env.DOCKERHUB_REPOSITORY }}:${{ steps.bump-semver.outputs.new_version }}
         run: |
@@ -84,6 +89,19 @@ jobs:
           docker buildx build . -f ./utils/Dockerfile -t ${{ env.DOCKER_IMAGE }} \
             --build-arg SERVICE_VERSION=${{ steps.bump-semver.outputs.new_version }} \
             --provenance false --push
+          echo "docker_image=${{ env.DOCKER_IMAGE }}" >> "$GITHUB_OUTPUT"
+      
+      - name: Build and push Docker Image for Caddyfile
+        id: caddy-docker-build
+        env:
+          DOCKER_IMAGE: ${{ env.CADDY_DOCKERHUB_REPO }}:${{ steps.bump-semver.outputs.new_version }}
+        run: |
+          docker buildx create --use
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker buildx build . -f ./deploy/caddy/caddy.dockerfile -t ${{ env.DOCKER_IMAGE }} \
+            --build-arg SERVICE_VERSION=${{ steps.bump-semver.outputs.new_version }} \
+            --provenance false --push
+          echo "docker_image=${{ env.DOCKER_IMAGE }}" >> "$GITHUB_OUTPUT"
 
       - name: Create Release Notes
         id: create-release
@@ -92,6 +110,24 @@ jobs:
             -H "authorization: Bearer ${{ secrets.TOKEN_GITHUB }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d '{"tag_name":"${{ steps.bump-semver.outputs.new_version }}", "prerelease":true, "generate_release_notes":true}'
+      
+
+      # SSH Action to redeploy
+      - name: "Deploy Selected Image"
+        id: deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            cd ${{ secrets.DEPLOY_FILE }}
+            docker pull ${{ steps.app-docker-build.outputs.docker_image }}
+            docker pull ${{ steps.caddy-docker-build.outputs.docker_image }}
+            docker compose down
+            docker compose up -d
+            docker system prune --volumes -af
 
 
       # Below is for notification
