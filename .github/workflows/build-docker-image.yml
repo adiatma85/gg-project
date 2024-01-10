@@ -51,7 +51,7 @@ jobs:
           go install github.com/cbroglie/mustache/cmd/mustache@v1.4.0
           touch ./etc/cfg/conf.json
           mustache --layout ./etc/tpl/conf.template.json secrets.json ./etc/cfg/conf.json >> ./etc/cfg/conf.json
-          echo -n > ./deploy/caddy/Caddyfile
+          echo -n >> ./deploy/caddy/Caddyfile
           mustache --layout ./deploy/caddy/Caddyfile.template secrets.json ./deploy/caddy/Caddyfile >> ./deploy/caddy/Caddyfile
           rm secrets.json
 
