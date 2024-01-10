@@ -86,7 +86,7 @@ jobs:
         run: |
           docker buildx create --use
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-          docker buildx build . -f ./utils/Dockerfile -t ${{ env.DOCKER_IMAGE }} \
+          docker buildx build . -f ./utils/Dockerfile -t ${{ env.DOCKER_IMAGE }} -t ${{ env.DOCKERHUB_REPOSITORY }}:latest\
             --build-arg SERVICE_VERSION=${{ steps.bump-semver.outputs.new_version }} \
             --provenance false --push
           echo "docker_image=${{ env.DOCKER_IMAGE }}" >> "$GITHUB_OUTPUT"
@@ -98,7 +98,7 @@ jobs:
         run: |
           docker buildx create --use
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-          docker buildx build ./deploy/caddy -f ./deploy/caddy/caddy.dockerfile -t ${{ env.DOCKER_IMAGE }} \
+          docker buildx build ./deploy/caddy -f ./deploy/caddy/caddy.dockerfile -t ${{ env.DOCKER_IMAGE }} -t ${{ env.CADDY_DOCKERHUB_REPO }}:latest \
             --build-arg SERVICE_VERSION=${{ steps.bump-semver.outputs.new_version }} \
             --provenance false --push
           echo "docker_image=${{ env.DOCKER_IMAGE }}" >> "$GITHUB_OUTPUT"
