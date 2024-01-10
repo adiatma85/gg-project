@@ -21,7 +21,7 @@
 	}
 }
 
-{{ CADDY_HOST_NAME }}:80 {
+{{ CADDY_HOST_NAME }} {
 	encode zstd gzip
 	import static
 	import security
