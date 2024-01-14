@@ -196,6 +196,13 @@ func (r *rest) Register() {
 	v1.GET("/task/:task_id", r.GetTaskById)
 	v1.PUT("/task/:task_id", r.UpdateTask)
 	v1.DELETE("/task/:task_id", r.DeleteTask)
+
+	// role
+	v1.GET("/role", r.GetListRole)
+	v1.POST("/role", r.CreateRole)
+	v1.GET("/role/:roel_id", r.GetRoleById)
+	v1.PUT("/role/:roel_id", r.UpdateRole)
+	v1.DELETE("/role/:roel_id", r.DeleteRole)
 }
 
 func (r *rest) registerSwaggerRoutes() {

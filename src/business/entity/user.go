@@ -8,6 +8,7 @@ import (
 
 type User struct {
 	ID          int64       `db:"id" json:"id"`
+	RoleId      int64       `db:"fk_role_id" json:"roleId"`
 	Email       string      `db:"email" json:"email"`
 	Username    string      `db:"username" json:"username"`
 	Password    string      `db:"password" json:"-"`
@@ -31,6 +32,7 @@ func (u *User) ConvertToAuthUser() jwtAuth.User {
 
 type UserParam struct {
 	ID          null.Int64  `param:"id" uri:"user_id" db:"id" form:"id"`
+	RoleId      null.Int64  `param:"fk_role_id" uri:"role_id" db:"fk_role_id" form:"fk_role_id"`
 	IDs         []int64     `param:"ids" uri:"user_ids" db:"id" form:"userIds"`
 	Email       null.String `param:"email" db:"email"`
 	Username    null.String `param:"username" db:"username"`
@@ -40,6 +42,7 @@ type UserParam struct {
 }
 
 type CreateUserParam struct {
+	RoleId          string      `db:"fk_role_id" json:"roleId"`
 	Email           string      `db:"email" json:"email"`
 	Username        string      `db:"username" json:"username"`
 	Password        string      `db:"password" json:"password"`
@@ -49,6 +52,7 @@ type CreateUserParam struct {
 }
 
 type UpdateUserParam struct {
+	RoleId      string      `param:"fk_role_id" db:"fk_role_id" json:"roleId"`
 	Username    string      `param:"username" db:"username" json:"username"`
 	DisplayName string      `param:"display_name" db:"display_name" json:"displayName"`
 	Password    string      `param:"password" db:"password" json:"password"`

@@ -119,7 +119,7 @@ func (r *rest) GetTaskById(ctx *gin.Context) {
 // @Param task_id path integer true "Task id"
 // @Param task body entity.UpdateTaskParam true "Task data"
 // @Produce json
-// @Success 200 {object} entity.HTTPResp{data=entity.Task{}}
+// @Success 200 {object} entity.HTTPResp{}
 // @Failure 500 {object} entity.HTTPResp{}
 // @Router /v1/task/{task_id} [PUT]
 func (r *rest) UpdateTask(ctx *gin.Context) {
@@ -149,7 +149,7 @@ func (r *rest) UpdateTask(ctx *gin.Context) {
 // @Tags Task
 // @Param task_id path integer true "task id"
 // @Produce json
-// @Success 200 {object} entity.HTTPResp{data=entity.Task{}}
+// @Success 200 {object} entity.HTTPResp{}
 // @Failure 500 {object} entity.HTTPResp{}
 // @Router /v1/task/{task_id} [DELETE]
 func (r *rest) DeleteTask(ctx *gin.Context) {

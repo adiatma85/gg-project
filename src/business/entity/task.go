@@ -72,6 +72,7 @@ type UpdateTaskParam struct {
 	Periodic   null.String `db:"periodic" param:"periodic" json:"periodic"`
 	DueTime    null.Time   `db:"due_time" json:"dueTime" param:"due_time"`
 	Status     null.Int64  `db:"status" param:"status" json:"status" swaggertype:"string"`
+	UpdatedAt  null.Time   `db:"updated_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
 	UpdatedBy  null.String `db:"updated_by" json:"-" swaggertype:"string"`
 	DeletedAt  null.Time   `db:"deleted_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
 	DeletedBy  null.String `db:"deleted_by" json:"-" swaggertype:"string"`

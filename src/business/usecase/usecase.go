@@ -3,6 +3,7 @@ package usecase
 import (
 	"github.com/adiatma85/gg-project/src/business/domain"
 	"github.com/adiatma85/gg-project/src/business/usecase/category"
+	"github.com/adiatma85/gg-project/src/business/usecase/role"
 	"github.com/adiatma85/gg-project/src/business/usecase/task"
 	"github.com/adiatma85/gg-project/src/business/usecase/user"
 	"github.com/adiatma85/own-go-sdk/jwtAuth"
@@ -13,6 +14,7 @@ type Usecase struct {
 	User     user.Interface
 	Category category.Interface
 	Task     task.Interface
+	Role     role.Interface
 }
 
 type InitParam struct {
@@ -26,6 +28,7 @@ func Init(param InitParam) *Usecase {
 		User:     user.Init(user.InitParam{Log: param.Log, User: param.Dom.User, JwtAuth: param.JwtAuth}),
 		Category: category.Init(category.InitParam{Log: param.Log, Category: param.Dom.Category, JwtAuth: param.JwtAuth}),
 		Task:     task.Init(task.InitParam{Log: param.Log, Task: param.Dom.Task, JwtAuth: param.JwtAuth}),
+		Role:     role.Init(role.InitParam{Log: param.Log, Role: param.Dom.Role, JwtAuth: param.JwtAuth}),
 	}
 
 	return usecase

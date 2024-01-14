@@ -48,7 +48,7 @@ func Init(param InitParam) Interface {
 func (t *task) Create(ctx context.Context, insertParam entity.CreateTaskParam) (entity.Task, error) {
 	result := entity.Task{}
 
-	tx, err := t.db.Leader().BeginTx(ctx, "txcUser", sql.TxOptions{})
+	tx, err := t.db.Leader().BeginTx(ctx, "txcTask", sql.TxOptions{})
 	if err != nil {
 		return result, errors.NewWithCode(codes.CodeSQLTxBegin, err.Error())
 	}
