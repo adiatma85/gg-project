@@ -6,6 +6,9 @@ import (
 )
 
 const (
+	RoleIdSuperAdmin = 1
+
+	// Role Type Enum
 	RoleTypeAdmin = "admin"
 	RoleTypeUser  = "user"
 )

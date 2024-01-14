@@ -180,7 +180,7 @@ func (r *rest) Register() {
 	v1.DELETE("/user/:user_id", r.DeleteUser)
 
 	// user management admin api
-	v1.GET("/admin/user", r.GetListUserAsAdmin)
+	v1.GET("/admin/user", r.isAdmin, r.GetListUserAsAdmin)
 
 	// category
 	v1.GET("/category", r.GetListCategory)
@@ -198,11 +198,11 @@ func (r *rest) Register() {
 	v1.DELETE("/task/:task_id", r.DeleteTask)
 
 	// role
-	v1.GET("/role", r.GetListRole)
-	v1.POST("/role", r.CreateRole)
-	v1.GET("/role/:roel_id", r.GetRoleById)
-	v1.PUT("/role/:roel_id", r.UpdateRole)
-	v1.DELETE("/role/:roel_id", r.DeleteRole)
+	v1.GET("/role", r.isAdmin, r.GetListRole)
+	v1.POST("/role", r.isAdmin, r.CreateRole)
+	v1.GET("/role/:roel_id", r.isAdmin, r.GetRoleById)
+	v1.PUT("/role/:roel_id", r.isAdmin, r.UpdateRole)
+	v1.DELETE("/role/:roel_id", r.isAdmin, r.DeleteRole)
 }
 
 func (r *rest) registerSwaggerRoutes() {

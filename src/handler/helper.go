@@ -268,3 +268,18 @@ func (r *rest) verifyUserAuth(ctx *gin.Context) (entity.User, error) {
 
 	return user, nil
 }
+
+func (r *rest) isAdmin(ctx *gin.Context) {
+	user, err := r.verifyUserAuth(ctx)
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	if user.RoleId != entity.RoleIdSuperAdmin {
+		r.httpRespError(ctx, errors.NewWithCode(codes.CodeUnauthorized, "error role to try access on admin resources"))
+		return
+	}
+
+	ctx.Next()
+}

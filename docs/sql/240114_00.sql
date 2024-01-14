@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `role` (
 );
 
 -- [DDL] Add new column `fk_role_id` in user table
-ALTER TABLE `user` ADD `fk_role_id` INT COMMENT 'Foreign Key To role Id' AFTER `d`;
+ALTER TABLE `user` ADD `fk_role_id` INT COMMENT 'Foreign Key To role Id' AFTER `id`;
 
 
 -- [DML] Populate role admin and user
