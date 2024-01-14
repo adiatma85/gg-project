@@ -63,13 +63,14 @@ func (r *rest) GetListTask(ctx *gin.Context) {
 // @Description Get list all Task by User Id
 // @Security BearerAuth
 // @Tags Task
+// @Param user_id path integer true "user id"
 // @Param limit query integer false "limit"
 // @Param page query integer false "page"
 // @Param disableLimit query boolean false "disable limit" Enums(true, false)
 // @Produce json
 // @Success 200 {object} entity.HTTPResp{data=[]entity.Task{}}
 // @Failure 500 {object} entity.HTTPResp{}
-// @Router /v1/task/user/{user_id} [GET]
+// @Router /v1/user/{user_id}/task [GET]
 func (r *rest) GetListTaskWithUserId(ctx *gin.Context) {
 	var param entity.TaskParam
 	if err := r.BindParams(ctx, &param); err != nil {

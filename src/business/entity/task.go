@@ -5,22 +5,36 @@ import (
 	"github.com/adiatma85/own-go-sdk/query"
 )
 
+const (
+	// Task statuses
+	TaskStatusTodo    = "todo"
+	TaskStatusOnGoing = "ongoing"
+	TaskStatusDone    = "done"
+
+	// Task Periodic Num
+	TaskPeriodicNone    = "none"
+	TaskPeriodicDaily   = "daily"
+	TaskPeriodicWeekly  = "weekly"
+	TaskPeriodicMonthly = "monthly"
+	TaskPeriodicYearly  = "yearly"
+)
+
 type Task struct {
-	ID         int64     `db:"id" json:"id"`
-	UserId     int64     `db:"fk_user_id" json:"userId"`
-	CategoryID int64     `db:"fk_category_id" json:"categoryId"`
-	Title      string    `db:"title" json:"title"`
-	Priority   int64     `db:"priority" json:"priority"`
-	TaskStatus string    `db:"task_status" json:"taskStatus"`
-	Periodic   string    `db:"periodic" json:"periodic"`
-	DueTime    null.Time `db:"due_time" json:"dueTime"`
-	Status     int64     `db:"status" json:"status" swaggertype:"integer"`
-	CreatedAt  null.Time `db:"created_at" json:"createdAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
-	CreatedBy  string    `db:"created_by" json:"createdBy" swaggertype:"string"`
-	UpdatedAt  null.Time `db:"updated_at" json:"updatedAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
-	UpdatedBy  string    `db:"updated_by" json:"updatedBy" swaggertype:"string"`
-	DeletedAt  null.Time `db:"deleted_at" json:"deletedAt,omitempty" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
-	DeletedBy  string    `db:"deleted_by" json:"deletedBy,omitempty" swaggertype:"string"`
+	ID         int64       `db:"id" json:"id"`
+	UserId     int64       `db:"fk_user_id" json:"userId"`
+	CategoryID int64       `db:"fk_category_id" json:"categoryId"`
+	Title      string      `db:"title" json:"title"`
+	Priority   int64       `db:"priority" json:"priority"`
+	TaskStatus string      `db:"task_status" json:"taskStatus"`
+	Periodic   string      `db:"periodic" json:"periodic"`
+	DueTime    null.Time   `db:"due_time" json:"dueTime"`
+	Status     int64       `db:"status" json:"status" swaggertype:"integer"`
+	CreatedAt  null.Time   `db:"created_at" json:"createdAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	CreatedBy  null.String `db:"created_by" json:"createdBy" swaggertype:"string"`
+	UpdatedAt  null.Time   `db:"updated_at" json:"updatedAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	UpdatedBy  null.String `db:"updated_by" json:"updatedBy" swaggertype:"string"`
+	DeletedAt  null.Time   `db:"deleted_at" json:"deletedAt,omitempty" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	DeletedBy  null.String `db:"deleted_by" json:"deletedBy,omitempty" swaggertype:"string"`
 }
 
 type TaskParam struct {
@@ -39,7 +53,7 @@ type TaskParam struct {
 }
 
 type CreateTaskParam struct {
-	UserId     int64       `db:"fk_user_id" json:"userId"`
+	UserId     int64       `db:"fk_user_id" json:"-"`
 	CategoryID int64       `db:"fk_category_id" json:"categoryId"`
 	Title      string      `db:"title" json:"title"`
 	Priority   int64       `db:"priority" json:"priority"`

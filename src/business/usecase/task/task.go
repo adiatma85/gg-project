@@ -50,12 +50,14 @@ func (t *task) Create(ctx context.Context, req entity.CreateTaskParam) (entity.T
 		return entity.Task{}, err
 	}
 
+	req.UserId = user.User.ID
 	req.CreatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
 
 	return t.task.Create(ctx, req)
 }
 
 func (t *task) Get(ctx context.Context, params entity.TaskParam) (entity.Task, error) {
+	params.QueryOption.IsActive = true
 	return t.task.Get(ctx, params)
 }
 
