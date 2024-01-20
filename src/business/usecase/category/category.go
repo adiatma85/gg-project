@@ -73,6 +73,15 @@ func (c *category) GetList(ctx context.Context, params entity.CategoryParam) ([]
 }
 
 func (c *category) Update(ctx context.Context, updateParam entity.UpdateCategoryParam, selectParam entity.CategoryParam) error {
+
+	user, err := c.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	updateParam.UpdatedAt = null.TimeFrom(Now())
+	updateParam.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
+
 	return c.category.Update(ctx, updateParam, selectParam)
 }
 

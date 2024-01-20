@@ -96,6 +96,14 @@ func (t *task) GetList(ctx context.Context, params entity.TaskParam) ([]entity.T
 }
 
 func (t *task) Update(ctx context.Context, updateParam entity.UpdateTaskParam, selectParam entity.TaskParam) error {
+	user, err := t.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	updateParam.UpdatedAt = null.TimeFrom(Now())
+	updateParam.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
+
 	return t.task.Update(ctx, updateParam, selectParam)
 }
 

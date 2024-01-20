@@ -13,7 +13,6 @@ import (
 	"github.com/adiatma85/own-go-sdk/log"
 	"github.com/adiatma85/own-go-sdk/null"
 	"github.com/adiatma85/own-go-sdk/query"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,12 +24,14 @@ type Interface interface {
 	Update(ctx context.Context, updateParam entity.UpdateUserParam, selectParam entity.UserParam) error
 	Delete(ctx context.Context, selectParam entity.UserParam) error
 	SignInWithPassword(ctx context.Context, req entity.UserLoginRequest) (entity.UserLoginResponse, error)
+	GetSelfProfile(ctx context.Context) (entity.User, error)
+	SelfDelete(ctx context.Context) error
+	ChangePassword(ctx context.Context, changePasswordReq entity.ChangePasswordRequest) error
 
 	// Improvement kedepannya
 	// CheckPassword(ctx context.Context, params entity.UserCheckPasswordParam, userParam entity.UserParam) (entity.HTTPMessage, error)
 	// ChangePassword(ctx context.Context, passwordChangeParam entity.UserChangePasswordParam, userParam entity.UserParam) (entity.HTTPMessage, error)
 	// Activate(ctx context.Context, selectParam entity.UserParam) error
-	// SignInWithPassword(ctx context.Context, req entity.UserLoginRequest) (entity.UserLoginResponse, error)
 	// RefreshToken(ctx context.Context, param entity.UserRefreshTokenParam) (entity.RefreshTokenResponse, error)
 }
 
@@ -123,14 +124,27 @@ func (u *user) GetListAsAdmin(ctx context.Context, params entity.UserParam) ([]e
 }
 
 func (u *user) Update(ctx context.Context, updateParam entity.UpdateUserParam, selectParam entity.UserParam) error {
+	user, err := u.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	updateParam.UpdatedAt = null.TimeFrom(Now())
+	updateParam.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
+
 	return u.user.Update(ctx, updateParam, selectParam)
 }
 
 func (u *user) Delete(ctx context.Context, selectParam entity.UserParam) error {
+	user, err := u.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
 	deleteParam := entity.UpdateUserParam{
 		Status:    null.Int64From(-1),
 		DeletedAt: null.TimeFrom(Now()),
-		DeletedBy: null.StringFrom(fmt.Sprintf("%v", entity.SystemUser)),
+		DeletedBy: null.StringFrom(fmt.Sprintf("%v", user.User.ID)),
 	}
 
 	return u.user.Update(ctx, deleteParam, selectParam)
@@ -170,6 +184,11 @@ func (u *user) SignInWithPassword(ctx context.Context, req entity.UserLoginReque
 		return entity.UserLoginResponse{}, err
 	}
 
+	// Validate the password in here
+	if u.checkHashPassword(user.Password, req.Password) {
+		return entity.UserLoginResponse{}, errors.NewWithCode(codes.CodeUnauthorized, "credential does not match")
+	}
+
 	// Create the JWT token in here
 	accessToken, err := u.jwtAuth.CreateAccessToken(user.ConvertToAuthUser())
 	if err != nil {
@@ -197,22 +216,74 @@ func (u *user) validateUserLoginRequest(req entity.UserLoginRequest) error {
 	return nil
 }
 
-func (u *user) tempCreateToken(user jwtAuth.User) (string, error) {
-	expirationTime := time.Now().Add(5 * time.Hour)
-
-	claims := &jwtAuth.Claim{
-		UserID: user.ID,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("JUANCOK"))
-
+func (u *user) GetSelfProfile(ctx context.Context) (entity.User, error) {
+	user, err := u.jwtAuth.GetUserAuthInfo(ctx)
 	if err != nil {
-		return "", err
+		return entity.User{}, err
 	}
 
-	return tokenString, nil
+	userParam := entity.UserParam{
+		ID: null.Int64From(user.User.ID),
+	}
+
+	return u.user.Get(ctx, userParam)
+}
+
+func (u *user) SelfDelete(ctx context.Context) error {
+	user, err := u.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	selectParam := entity.UserParam{
+		ID: null.Int64From(user.User.ID),
+	}
+
+	deleteParam := entity.UpdateUserParam{
+		Status:    null.Int64From(-1),
+		DeletedAt: null.TimeFrom(Now()),
+		DeletedBy: null.StringFrom(fmt.Sprintf("%v", user.User.ID)),
+	}
+
+	return u.user.Update(ctx, deleteParam, selectParam)
+}
+
+func (u *user) ChangePassword(ctx context.Context, changePasswordReq entity.ChangePasswordRequest) error {
+	// Check first if the password and confirm password is match
+	if changePasswordReq.Password != changePasswordReq.ConfirmPassword {
+		return errors.NewWithCode(codes.CodeBadRequest, "new password and confirm password does not match")
+	}
+
+	// Check if the old password is match
+	userAuth, err := u.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	userDn, err := u.user.Get(ctx, entity.UserParam{
+		ID: null.Int64From(userAuth.User.ID),
+		QueryOption: query.Option{
+			IsActive: true,
+		},
+	})
+
+	if u.checkHashPassword(userDn.Password, changePasswordReq.OldPassword) {
+		return errors.NewWithCode(codes.CodeUnauthorized, "credential does not match")
+	}
+
+	// Update the entry
+	hashedPass, err := u.getHashPassowrd(changePasswordReq.Password)
+	if err != nil {
+		return err
+	}
+
+	updateParam := entity.UpdateUserParam{
+		Password: hashedPass,
+	}
+
+	selectParam := entity.UserParam{
+		ID: null.Int64From(userDn.ID),
+	}
+
+	return u.user.Update(ctx, updateParam, selectParam)
 }

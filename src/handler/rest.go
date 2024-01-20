@@ -176,11 +176,14 @@ func (r *rest) Register() {
 
 	// user
 	v1.GET("/user/:user_id", r.GetUserByID)
-	v1.PUT("/user/:user_id", r.UpdateUser)
-	v1.DELETE("/user/:user_id", r.DeleteUser)
+	v1.GET("/user/profile", r.UserProfile)
+	v1.GET("/user/profile/self-delete", r.UserSelfDelete)
+	v1.PUT("/user/profile/change-password", r.UserChangePassword)
 
 	// user management admin api
 	v1.GET("/admin/user", r.isAdmin, r.GetListUserAsAdmin)
+	v1.DELETE("/admin/user/:user_id", r.DeleteUser)
+	v1.PUT("/admin/user/:user_id", r.isAdmin, r.UpdateUser)
 
 	// category
 	v1.GET("/category", r.GetListCategory)

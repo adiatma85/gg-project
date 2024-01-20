@@ -42,7 +42,7 @@ type UserParam struct {
 }
 
 type CreateUserParam struct {
-	RoleId          string      `db:"fk_role_id" json:"roleId"`
+	RoleId          int64       `db:"fk_role_id" json:"-"`
 	Email           string      `db:"email" json:"email"`
 	Username        string      `db:"username" json:"username"`
 	Password        string      `db:"password" json:"password"`
@@ -73,4 +73,10 @@ type UserLoginResponse struct {
 	Email       string `json:"email"`
 	DisplayName string `json:"displayName"`
 	AccessToken string `json:"accessToken"`
+}
+
+type ChangePasswordRequest struct {
+	OldPassword     string `db:"-" json:"oldPassword"`
+	Password        string `db:"-" json:"newPassword"`
+	ConfirmPassword string `db:"-" json:"confirmPassword"`
 }
