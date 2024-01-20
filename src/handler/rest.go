@@ -192,7 +192,6 @@ func (r *rest) Register() {
 	// task
 	v1.GET("/task", r.GetListTask)
 	v1.POST("/task", r.CreateTask)
-	v1.GET("/user/:user_id/task", r.GetListTaskWithUserId)
 	v1.GET("/task/:task_id", r.GetTaskById)
 	v1.PUT("/task/:task_id", r.UpdateTask)
 	v1.DELETE("/task/:task_id", r.DeleteTask)
