@@ -22,7 +22,7 @@ const (
 type Task struct {
 	ID         int64       `db:"id" json:"id"`
 	UserId     int64       `db:"fk_user_id" json:"userId"`
-	CategoryID int64       `db:"fk_category_id" json:"categoryId"`
+	CategoryID null.Int64  `db:"fk_category_id" json:"categoryId"`
 	Title      string      `db:"title" json:"title"`
 	Priority   int64       `db:"priority" json:"priority"`
 	TaskStatus string      `db:"task_status" json:"taskStatus"`

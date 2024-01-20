@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	ID          int64       `db:"id" json:"id"`
-	RoleId      int64       `db:"fk_role_id" json:"roleId"`
+	RoleId      null.Int64  `db:"fk_role_id" json:"roleId"`
 	Email       string      `db:"email" json:"email"`
 	Username    string      `db:"username" json:"username"`
 	Password    string      `db:"password" json:"-"`

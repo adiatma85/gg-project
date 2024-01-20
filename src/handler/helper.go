@@ -276,7 +276,7 @@ func (r *rest) isAdmin(ctx *gin.Context) {
 		return
 	}
 
-	if user.RoleId != entity.RoleIdSuperAdmin {
+	if user.RoleId.Int64 != entity.RoleIdSuperAdmin {
 		r.httpRespError(ctx, errors.NewWithCode(codes.CodeUnauthorized, "error role to try access on admin resources"))
 		return
 	}
