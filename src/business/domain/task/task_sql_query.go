@@ -1,8 +1,8 @@
 package task
 
 const (
-	createTask = `INSERT INTO task (fk_user_id, fk_category_id, title, priority, task_status, periodic, due_time, created_by)
-	VALUES (:fk_user_id, :fk_category_id, :title, :priority, :task_status, :periodic, :due_time, :created_by)`
+	createTask = `INSERT INTO task (fk_user_id, fk_category_id, title, priority, task_status, periodic, due_time, created_by, updated_by)
+	VALUES (:fk_user_id, :fk_category_id, :title, :priority, :task_status, :periodic, :due_time, :created_by, :updated_by)`
 
 	getTask = `
 		SELECT

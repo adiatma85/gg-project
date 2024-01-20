@@ -42,6 +42,7 @@ type CreateRoleParam struct {
 	Type      string      `db:"type" json:"type"`
 	Rank      int64       `db:"rank" json:"rank"`
 	CreatedBy null.String `json:"-" db:"created_by" swaggertype:"string"`
+	UpdatedBy null.String `json:"-" db:"updated_by" swaggertype:"string"`
 }
 
 type UpdateRoleParam struct {

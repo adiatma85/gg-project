@@ -51,6 +51,7 @@ func (c *category) Create(ctx context.Context, req entity.CreateCategoryParam) (
 	}
 
 	req.CreatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
+	req.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
 
 	return c.category.Create(ctx, req)
 }

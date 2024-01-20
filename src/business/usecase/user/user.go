@@ -67,6 +67,7 @@ func (u *user) Create(ctx context.Context, req entity.CreateUserParam) (entity.U
 	}
 
 	req.CreatedBy = null.StringFrom(fmt.Sprintf("%v", entity.SystemUser))
+	req.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", entity.SystemUser))
 
 	return u.user.Create(ctx, req)
 }

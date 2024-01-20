@@ -2,8 +2,8 @@ package category
 
 const (
 	createCategory = `
-	INSERT INTO category (name, created_by)
-	    VALUES (:name, :created_by)`
+	INSERT INTO category (name, created_by, updated_by)
+	    VALUES (:name, :created_by, :updated_by)`
 
 	getCategory = `
 		SELECT

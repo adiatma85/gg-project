@@ -49,6 +49,7 @@ type CreateUserParam struct {
 	ConfirmPassword string      `db:"-" json:"confirmPassword"`
 	DisplayName     string      `db:"display_name" json:"displayName"`
 	CreatedBy       null.String `json:"-" db:"created_by" swaggertype:"string"`
+	UpdatedBy       null.String `json:"-" db:"updated_by" swaggertype:"string"`
 }
 
 type UpdateUserParam struct {

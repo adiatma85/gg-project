@@ -28,6 +28,7 @@ type CategoryParam struct {
 type CreateCategoryParam struct {
 	Name      string      `db:"name" json:"name"`
 	CreatedBy null.String `json:"-" db:"created_by" swaggertype:"string"`
+	UpdatedBy null.String `json:"-" db:"updated_by" swaggertype:"string"`
 }
 
 type UpdateCategoryParam struct {

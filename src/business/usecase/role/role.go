@@ -47,6 +47,7 @@ func (r *role) Create(ctx context.Context, req entity.CreateRoleParam) (entity.R
 	}
 
 	req.CreatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
+	req.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
 
 	return r.role.Create(ctx, req)
 }

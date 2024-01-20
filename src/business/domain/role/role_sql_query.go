@@ -1,8 +1,8 @@
 package role
 
 const (
-	createRole = `INSERT INTO role (name, type, rank, created_by)
-	VALUES (:name, :type, :rank, :created_by)`
+	createRole = `INSERT INTO role (name, type, rank, created_by, updated_by)
+	VALUES (:name, :type, :rank, :created_by, :updated_by)`
 
 	getRole = `
 		SELECT

@@ -52,6 +52,7 @@ func (t *task) Create(ctx context.Context, req entity.CreateTaskParam) (entity.T
 
 	req.UserId = user.User.ID
 	req.CreatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
+	req.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
 
 	return t.task.Create(ctx, req)
 }

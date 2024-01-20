@@ -61,6 +61,7 @@ type CreateTaskParam struct {
 	Periodic   string      `db:"periodic" json:"periodic"`
 	DueTime    null.Time   `db:"due_time" json:"due_time"`
 	CreatedBy  null.String `json:"-" db:"created_by" swaggertype:"string"`
+	UpdatedBy  null.String `json:"-" db:"updated_by" swaggertype:"string"`
 }
 
 type UpdateTaskParam struct {
