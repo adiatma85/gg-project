@@ -59,12 +59,33 @@ func (t *task) Create(ctx context.Context, req entity.CreateTaskParam) (entity.T
 
 func (t *task) Get(ctx context.Context, params entity.TaskParam) (entity.Task, error) {
 	params.QueryOption.IsActive = true
+
+	user, err := t.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return entity.Task{}, err
+	}
+
+	// If the user id is not admin, then filter for that user
+	if user.User.ID != entity.RoleIdSuperAdmin {
+		params.UserId = null.Int64From(user.User.ID)
+	}
+
 	return t.task.Get(ctx, params)
 }
 
 func (t *task) GetList(ctx context.Context, params entity.TaskParam) ([]entity.Task, *entity.Pagination, error) {
 	params.IncludePagination = true
 	params.QueryOption.IsActive = true
+
+	user, err := t.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return []entity.Task{}, &entity.Pagination{}, err
+	}
+
+	// If the user id is not admin, then filter for that user
+	if user.User.ID != entity.RoleIdSuperAdmin {
+		params.UserId = null.Int64From(user.User.ID)
+	}
 
 	tasks, pg, err := t.task.GetList(ctx, params)
 	if err != nil {

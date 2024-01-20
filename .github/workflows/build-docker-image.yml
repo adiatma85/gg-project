@@ -87,7 +87,7 @@ jobs:
           DOCKER_IMAGE: ${{ env.DOCKERHUB_REPOSITORY }}:${{ steps.bump-semver.outputs.new_version }}
         run: |
           docker buildx create --use
-          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u --password-stdin
           docker buildx build . -f ./utils/Dockerfile -t ${{ env.DOCKER_IMAGE }} -t ${{ env.DOCKERHUB_REPOSITORY }}:latest\
             --build-arg SERVICE_VERSION=${{ steps.bump-semver.outputs.new_version }} \
             --provenance false --push
@@ -99,7 +99,7 @@ jobs:
           DOCKER_IMAGE: ${{ env.CADDY_DOCKERHUB_REPO }}:${{ steps.bump-semver.outputs.new_version }}
         run: |
           docker buildx create --use
-          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u --password-stdin
           docker buildx build ./deploy/caddy -f ./deploy/caddy/caddy.dockerfile -t ${{ env.DOCKER_IMAGE }} -t ${{ env.CADDY_DOCKERHUB_REPO }}:latest \
             --build-arg SERVICE_VERSION=${{ steps.bump-semver.outputs.new_version }} \
             --provenance false --push
@@ -125,7 +125,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd ${{ secrets.DEPLOY_FILE }}
-            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u --password-stdin
             docker compose down
             docker compose up -d
             docker system prune --volumes -af
