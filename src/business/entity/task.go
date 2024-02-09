@@ -25,8 +25,8 @@ type Task struct {
 	CategoryID null.Int64  `db:"fk_category_id" json:"categoryId"`
 	Title      string      `db:"title" json:"title"`
 	Priority   int64       `db:"priority" json:"priority"`
-	TaskStatus string      `db:"task_status" json:"taskStatus"`
-	Periodic   string      `db:"periodic" json:"periodic"`
+	TaskStatus string      `db:"task_status" json:"taskStatus"`	//todo, ongoing, done
+	Periodic   string      `db:"periodic" json:"periodic"` //none, daily, weekly, monthly, yearly
 	DueTime    null.Time   `db:"due_time" json:"dueTime"`
 	Status     int64       `db:"status" json:"status" swaggertype:"integer"`
 	CreatedAt  null.Time   `db:"created_at" json:"createdAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
@@ -43,8 +43,8 @@ type TaskParam struct {
 	UserId     null.Int64  `param:"fk_user_id" uri:"user_id" db:"fk_user_id"`
 	CategoryID null.Int64  `param:"fk_category_id" uri:"category_id" db:"fk_category_id"`
 	Title      null.String `param:"title" db:"title"`
-	Priority   null.Int64  `param:"priority" db:"priority"`
-	TaskStatus null.String `param:"task_status" db:"task_status"`
+	Priority   null.Int64  `param:"priority" db:"priority"` //none, daily, weekly, monthly, yearly
+	TaskStatus string `param:"task_status" db:"task_status" form:"taskStatus"` //todo, ongoing, done
 	Periodic   null.String `param:"periodic" db:"periodic"`
 	DueTime    null.Time   `param:"due_time" db:"due_time"`
 	Status     null.Int64  `param:"status" db:"status" swaggertype:"string"`
@@ -57,8 +57,8 @@ type CreateTaskParam struct {
 	CategoryID int64       `db:"fk_category_id" json:"categoryId"`
 	Title      string      `db:"title" json:"title"`
 	Priority   int64       `db:"priority" json:"priority"`
-	TaskStatus string      `db:"task_status" json:"taskStatus"`
-	Periodic   string      `db:"periodic" json:"periodic"`
+	TaskStatus string      `db:"task_status" json:"taskStatus"` //todo, ongoing, done
+	Periodic   string      `db:"periodic" json:"periodic"` //none, daily, weekly, monthly, yearly
 	DueTime    null.Time   `db:"due_time" json:"due_time"`
 	CreatedBy  null.String `json:"-" db:"created_by" swaggertype:"string"`
 	UpdatedBy  null.String `json:"-" db:"updated_by" swaggertype:"string"`
@@ -68,8 +68,8 @@ type UpdateTaskParam struct {
 	UserId     null.Int64  `param:"fk_user_id" db:"fk_user_id" json:"userId"`
 	CategoryID null.Int64  `param:"fk_category_id" db:"fk_category_id" json:"categoryId"`
 	Title      string      `param:"title" db:"title" json:"title"`
-	Priority   int64       `param:"priority" db:"priority" json:"priority"`
-	TaskStatus string      `param:"task_status" db:"task_status" json:"taskStatus"`
+	Priority   int64       `param:"priority" db:"priority" json:"priority"` //none, daily, weekly, monthly, yearly
+	TaskStatus string      `param:"task_status" db:"task_status" json:"taskStatus"` //todo, ongoing, done
 	Periodic   null.String `db:"periodic" param:"periodic" json:"periodic"`
 	DueTime    null.Time   `db:"due_time" json:"dueTime" param:"due_time"`
 	Status     null.Int64  `db:"status" param:"status" json:"status" swaggertype:"string"`

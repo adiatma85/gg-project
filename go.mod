@@ -5,7 +5,6 @@ go 1.21
 require (
 	github.com/adiatma85/own-go-sdk v0.1.8
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.3.2
 	github.com/swaggo/swag v1.16.2
@@ -29,6 +28,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.15.5 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect

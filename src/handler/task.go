@@ -39,6 +39,7 @@ func (r *rest) CreateTask(ctx *gin.Context) {
 // @Param limit query integer false "limit"
 // @Param page query integer false "page"
 // @Param disableLimit query boolean false "disable limit" Enums(true, false)
+// @Param taskStatus query string false "Filter task by status" Enums(ongoing, todo, done)
 // @Produce json
 // @Success 200 {object} entity.HTTPResp{data=[]entity.Task{}}
 // @Failure 500 {object} entity.HTTPResp{}
@@ -138,3 +139,5 @@ func (r *rest) DeleteTask(ctx *gin.Context) {
 
 	r.httpRespSuccess(ctx, codes.CodeSuccess, nil, nil)
 }
+
+// Filter task by taskStatus
