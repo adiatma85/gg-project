@@ -38,3 +38,6 @@ deploy/caddy/caddy.production.dockerfile
 deploy/caddy/Caddyfile.production
 deploy/caddy_config/*
 deploy/caddy_data/*
+
+# Docs sql file
+./docs/sql/temp.sql

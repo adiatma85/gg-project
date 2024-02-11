@@ -139,5 +139,3 @@ func (r *rest) DeleteTask(ctx *gin.Context) {
 
 	r.httpRespSuccess(ctx, codes.CodeSuccess, nil, nil)
 }
-
-// Filter task by taskStatus
