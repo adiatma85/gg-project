@@ -127,8 +127,8 @@ jobs:
             cd ${{ secrets.DEPLOY_FILE }}
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             docker compose down
-            docker compose up -d
             docker system prune --volumes -af
+            docker compose up -d
 
 
       # Below is for notification
