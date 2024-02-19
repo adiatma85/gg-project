@@ -75,7 +75,7 @@ jobs:
           fi
       
       - name: Generate New Bumped Version
-        uses: DelosAqua/action-bump-semver@v1.1.0
+        uses: adiatma85/action-bump-semver@v1.0.0
         id: bump-semver
         with:
           current_version: ${{ steps.latest-tag.outputs.tag }}
