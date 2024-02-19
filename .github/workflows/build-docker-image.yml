@@ -71,7 +71,7 @@ jobs:
             | sort -V | sed 's/_$//' | tail -1)" >> "$GITHUB_OUTPUT"
 
       - name: Generate New Bumped Version
-        uses: adiatma85/action-bump-semver@v1.0.0
+        uses: DelosAqua/action-bump-semver@v1.1.0
         id: bump-semver
         with:
           current_version: ${{ steps.latest-tag.outputs.tag }}
