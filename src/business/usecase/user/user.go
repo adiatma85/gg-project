@@ -159,10 +159,16 @@ func (u *user) getHashPassowrd(password string) (string, error) {
 	return string(hash), nil
 }
 
+// Return true if the password is match
 func (u *user) checkHashPassword(ctx context.Context, hashPassword, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password))
-	u.log.Error(ctx, err)
-	return err == nil
+
+	if err != nil {
+		u.log.Error(ctx, err)
+		return false
+	}
+
+	return true
 }
 
 func (u *user) SignInWithPassword(ctx context.Context, req entity.UserLoginRequest) (entity.UserLoginResponse, error) {
@@ -188,7 +194,7 @@ func (u *user) SignInWithPassword(ctx context.Context, req entity.UserLoginReque
 	}
 
 	// Validate the password in here
-	if u.checkHashPassword(ctx, user.Password, req.Password) {
+	if !u.checkHashPassword(ctx, user.Password, req.Password) {
 		return entity.UserLoginResponse{}, errors.NewWithCode(codes.CodeUnauthorized, "credential does not match")
 	}
 
@@ -274,7 +280,7 @@ func (u *user) ChangePassword(ctx context.Context, changePasswordReq entity.Chan
 		return err
 	}
 
-	if u.checkHashPassword(ctx, userDn.Password, changePasswordReq.OldPassword) {
+	if !u.checkHashPassword(ctx, userDn.Password, changePasswordReq.OldPassword) {
 		return errors.NewWithCode(codes.CodeUnauthorized, "credential does not match")
 	}
 
