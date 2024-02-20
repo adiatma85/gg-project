@@ -270,6 +270,10 @@ func (u *user) ChangePassword(ctx context.Context, changePasswordReq entity.Chan
 		},
 	})
 
+	if err != nil {
+		return err
+	}
+
 	if u.checkHashPassword(ctx, userDn.Password, changePasswordReq.OldPassword) {
 		return errors.NewWithCode(codes.CodeUnauthorized, "credential does not match")
 	}
