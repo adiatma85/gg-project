@@ -3,13 +3,11 @@ package category
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/adiatma85/gg-project/src/business/entity"
 	"github.com/adiatma85/own-go-sdk/codes"
 	"github.com/adiatma85/own-go-sdk/errors"
 	"github.com/adiatma85/own-go-sdk/query"
-	"github.com/adiatma85/own-go-sdk/redis"
 	"github.com/adiatma85/own-go-sdk/sql"
 )
 
@@ -39,21 +37,6 @@ func (c *category) createSQLCategory(tx sql.CommandTx, v entity.CreateCategoryPa
 func (c *category) getSQLCategory(ctx context.Context, params entity.CategoryParam) (entity.Category, error) {
 	category := entity.Category{}
 
-	key, err := c.json.Marshal(params)
-	if err != nil {
-		return category, nil
-	}
-
-	cachedEntry, err := c.getCache(ctx, fmt.Sprintf(getCategoryByIdKey, string(key)))
-	switch {
-	case errors.Is(err, redis.Nil):
-		c.log.Info(ctx, fmt.Sprintf(entity.ErrorRedisNil, err.Error()))
-	case err != nil:
-		c.log.Error(ctx, fmt.Sprintf(entity.ErrorRedis, err.Error()))
-	default:
-		return cachedEntry, nil
-	}
-
 	qb := query.NewSQLQueryBuilder(c.db, "param", "db", &params.QueryOption)
 	queryExt, queryArgs, _, _, err := qb.Build(&params)
 	if err != nil {
@@ -71,10 +54,6 @@ func (c *category) getSQLCategory(ctx context.Context, params entity.CategoryPar
 		return category, errors.NewWithCode(codes.CodeSQLRowScan, err.Error())
 	} else if errors.Is(err, sql.ErrNotFound) {
 		return category, errors.NewWithCode(codes.CodeSQLRecordDoesNotExist, err.Error())
-	}
-
-	if err = c.upsertCache(ctx, fmt.Sprintf(getCategoryByIdKey, string(key)), category, time.Minute); err != nil {
-		c.log.Error(ctx, err)
 	}
 
 	return category, nil
@@ -138,10 +117,6 @@ func (c *category) updateSQLCategory(ctx context.Context, updateParam entity.Upd
 	}
 
 	c.log.Debug(ctx, fmt.Sprintf("successfully updated category: %v", updateParam))
-
-	if err := c.deleteCache(ctx); err != nil {
-		c.log.Error(ctx, err)
-	}
 
 	return nil
 }

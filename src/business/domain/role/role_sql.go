@@ -3,13 +3,11 @@ package role
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/adiatma85/gg-project/src/business/entity"
 	"github.com/adiatma85/own-go-sdk/codes"
 	"github.com/adiatma85/own-go-sdk/errors"
 	"github.com/adiatma85/own-go-sdk/query"
-	"github.com/adiatma85/own-go-sdk/redis"
 	"github.com/adiatma85/own-go-sdk/sql"
 )
 
@@ -39,21 +37,6 @@ func (r *role) createSQLRole(tx sql.CommandTx, v entity.CreateRoleParam) (sql.Co
 func (r *role) getSQLRole(ctx context.Context, params entity.RoleParam) (entity.Role, error) {
 	result := entity.Role{}
 
-	key, err := r.json.Marshal(params)
-	if err != nil {
-		return result, nil
-	}
-
-	cachedEntry, err := r.getCache(ctx, fmt.Sprintf(getRoleByIdKey, string(key)))
-	switch {
-	case errors.Is(err, redis.Nil):
-		r.log.Info(ctx, fmt.Sprintf(entity.ErrorRedisNil, err.Error()))
-	case err != nil:
-		r.log.Error(ctx, fmt.Sprintf(entity.ErrorRedis, err.Error()))
-	default:
-		return cachedEntry, nil
-	}
-
 	qb := query.NewSQLQueryBuilder(r.db, "param", "db", &params.QueryOption)
 	queryExt, queryArgs, _, _, err := qb.Build(&params)
 	if err != nil {
@@ -71,10 +54,6 @@ func (r *role) getSQLRole(ctx context.Context, params entity.RoleParam) (entity.
 		return result, errors.NewWithCode(codes.CodeSQLRowScan, err.Error())
 	} else if errors.Is(err, sql.ErrNotFound) {
 		return result, errors.NewWithCode(codes.CodeSQLRecordDoesNotExist, err.Error())
-	}
-
-	if err = r.upsertCache(ctx, fmt.Sprintf(getRoleByIdKey, string(key)), result, time.Minute); err != nil {
-		r.log.Error(ctx, err)
 	}
 
 	return result, nil
@@ -138,10 +117,6 @@ func (r *role) updateSQLRole(ctx context.Context, updateParam entity.UpdateRoleP
 	}
 
 	r.log.Debug(ctx, fmt.Sprintf("successfully updated role: %v", updateParam))
-
-	if err := r.deleteCache(ctx); err != nil {
-		r.log.Error(ctx, err)
-	}
 
 	return nil
 }

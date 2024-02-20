@@ -3,13 +3,11 @@ package task
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/adiatma85/gg-project/src/business/entity"
 	"github.com/adiatma85/own-go-sdk/codes"
 	"github.com/adiatma85/own-go-sdk/errors"
 	"github.com/adiatma85/own-go-sdk/query"
-	"github.com/adiatma85/own-go-sdk/redis"
 	"github.com/adiatma85/own-go-sdk/sql"
 )
 
@@ -39,21 +37,6 @@ func (t *task) createSQLTask(tx sql.CommandTx, v entity.CreateTaskParam) (sql.Co
 func (t *task) getSQLTask(ctx context.Context, params entity.TaskParam) (entity.Task, error) {
 	result := entity.Task{}
 
-	key, err := t.json.Marshal(params)
-	if err != nil {
-		return result, nil
-	}
-
-	cachedEntry, err := t.getCache(ctx, fmt.Sprintf(getTaskByIdKey, string(key)))
-	switch {
-	case errors.Is(err, redis.Nil):
-		t.log.Info(ctx, fmt.Sprintf(entity.ErrorRedisNil, err.Error()))
-	case err != nil:
-		t.log.Error(ctx, fmt.Sprintf(entity.ErrorRedis, err.Error()))
-	default:
-		return cachedEntry, nil
-	}
-
 	qb := query.NewSQLQueryBuilder(t.db, "param", "db", &params.QueryOption)
 	queryExt, queryArgs, _, _, err := qb.Build(&params)
 	if err != nil {
@@ -71,10 +54,6 @@ func (t *task) getSQLTask(ctx context.Context, params entity.TaskParam) (entity.
 		return result, errors.NewWithCode(codes.CodeSQLRowScan, err.Error())
 	} else if errors.Is(err, sql.ErrNotFound) {
 		return result, errors.NewWithCode(codes.CodeSQLRecordDoesNotExist, err.Error())
-	}
-
-	if err = t.upsertCache(ctx, fmt.Sprintf(getTaskByIdKey, string(key)), result, time.Minute); err != nil {
-		t.log.Error(ctx, err)
 	}
 
 	return result, nil
@@ -138,10 +117,6 @@ func (t *task) updateSQLTask(ctx context.Context, updateParam entity.UpdateTaskP
 	}
 
 	t.log.Debug(ctx, fmt.Sprintf("successfully updated task: %v", updateParam))
-
-	if err := t.deleteCache(ctx); err != nil {
-		t.log.Error(ctx, err)
-	}
 
 	return nil
 }

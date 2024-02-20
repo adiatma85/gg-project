@@ -9,7 +9,6 @@ import (
 	"github.com/adiatma85/own-go-sdk/log"
 	"github.com/adiatma85/own-go-sdk/null"
 	"github.com/adiatma85/own-go-sdk/parser"
-	"github.com/adiatma85/own-go-sdk/redis"
 	"github.com/adiatma85/own-go-sdk/sql"
 )
 
@@ -21,25 +20,22 @@ type Interface interface {
 }
 
 type InitParam struct {
-	Log   log.Interface
-	Db    sql.Interface
-	Json  parser.JSONInterface
-	Redis redis.Interface
+	Log  log.Interface
+	Db   sql.Interface
+	Json parser.JSONInterface
 }
 
 type category struct {
-	log   log.Interface
-	db    sql.Interface
-	json  parser.JSONInterface
-	redis redis.Interface
+	log  log.Interface
+	db   sql.Interface
+	json parser.JSONInterface
 }
 
 func Init(param InitParam) Interface {
 	c := &category{
-		log:   param.Log,
-		db:    param.Db,
-		json:  param.Json,
-		redis: param.Redis,
+		log:  param.Log,
+		db:   param.Db,
+		json: param.Json,
 	}
 
 	return c
@@ -61,10 +57,6 @@ func (c *category) Create(ctx context.Context, userParam entity.CreateCategoryPa
 
 	if err = tx.Commit(); err != nil {
 		return category, errors.NewWithCode(codes.CodeSQLTxCommit, err.Error())
-	}
-
-	if err := c.deleteCache(ctx); err != nil {
-		c.log.Error(ctx, err)
 	}
 
 	return c.Get(ctx, entity.CategoryParam{
