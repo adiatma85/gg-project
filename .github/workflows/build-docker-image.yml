@@ -43,7 +43,8 @@ jobs:
             "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
             "DATABASE_DRIVER": "${{ secrets.DATABASE_DRIVER }}",
             "REDIS_HOST": "${{ secrets.REDIS_HOST }}",
-            "CADDY_HOST_NAME": "${{ secrets.CADDY_HOST_NAME }}"
+            "CADDY_HOST_NAME": "${{ secrets.CADDY_HOST_NAME }}",
+            "APP_SECRET": "${{ secrets.APP_SECRET }}"
           }' >> secrets.json
         shell: bash
 
