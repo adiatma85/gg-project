@@ -98,6 +98,9 @@ func Init(param InitParam) REST {
 			r.http.Use(cors.New(cors.DefaultConfig()))
 		}
 
+		// Set Timeout
+		r.http.Use(r.SetTimeout)
+
 		r.Register()
 	})
 
