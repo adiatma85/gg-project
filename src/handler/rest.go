@@ -112,6 +112,7 @@ func Init(param InitParam) REST {
 	return r
 }
 
+// Need to resolve this
 func (r *rest) CustomRecovery(ctx *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
