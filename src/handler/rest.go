@@ -3,8 +3,11 @@ package handler
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
+	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -13,6 +16,8 @@ import (
 	"github.com/adiatma85/gg-project/src/business/usecase"
 	"github.com/adiatma85/gg-project/utils/config"
 	"github.com/adiatma85/own-go-sdk/appcontext"
+	"github.com/adiatma85/own-go-sdk/codes"
+	"github.com/adiatma85/own-go-sdk/errors"
 	"github.com/adiatma85/own-go-sdk/instrument"
 	"github.com/adiatma85/own-go-sdk/jwtAuth"
 	"github.com/adiatma85/own-go-sdk/log"
@@ -105,6 +110,35 @@ func Init(param InitParam) REST {
 	})
 
 	return r
+}
+
+func (r *rest) CustomRecovery(ctx *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			// Check for a broken connection, as it is not really a
+			// condition that warrants a panic stack trace.
+			var brokenPipe bool
+			if ne, ok := err.(*net.OpError); ok {
+				if se, ok := ne.Err.(*os.SyscallError); ok { // nolint: errorlint
+					if strings.Contains(strings.ToLower(se.Error()), "broken pipe") || strings.Contains(strings.ToLower(se.Error()), "connection reset by peer") {
+						brokenPipe = true
+					}
+				}
+			}
+			if brokenPipe {
+				// If the connection is dead, we can't write a status to it.
+				ctx.Error(err.(error)) // nolint: errcheck
+				ctx.Abort()
+			} else {
+				r.httpRespError(ctx, errors.NewWithCode(codes.CodeInternalServerError, http.StatusText(http.StatusInternalServerError)))
+			}
+
+			// Need to update SDK First before uncomment this
+			// r.log.Error(err)
+			// r.log.Panic(err)
+		}
+	}()
+	ctx.Next()
 }
 
 func (r *rest) Run() {
