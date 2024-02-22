@@ -217,7 +217,8 @@ func (r *rest) Register() {
 	// user
 	v1.GET("/user/:user_id", r.GetUserByID)
 	v1.GET("/user/profile", r.UserProfile)
-	v1.GET("/user/profile/self-delete", r.UserSelfDelete)
+	v1.PUT("/user/profile", r.UpdateUserProfile)
+	v1.GET("/user/profile", r.UserSelfDelete)
 	v1.PUT("/user/profile/change-password", r.UserChangePassword)
 
 	// user management admin api
