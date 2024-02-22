@@ -106,6 +106,9 @@ func Init(param InitParam) REST {
 		// Set Timeout
 		r.http.Use(r.SetTimeout)
 
+		// Set Recovery
+		r.http.Use(r.CustomRecovery)
+
 		r.Register()
 	})
 
@@ -135,8 +138,7 @@ func (r *rest) CustomRecovery(ctx *gin.Context) {
 			}
 
 			// Need to update SDK First before uncomment this
-			// r.log.Error(err)
-			// r.log.Panic(err)
+			r.log.Panic(err)
 		}
 	}()
 	ctx.Next()

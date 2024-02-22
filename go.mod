@@ -3,7 +3,7 @@ module github.com/adiatma85/gg-project
 go 1.21
 
 require (
-	github.com/adiatma85/own-go-sdk v0.1.8
+	github.com/adiatma85/own-go-sdk v0.1.9
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.3.2
