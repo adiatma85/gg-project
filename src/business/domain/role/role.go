@@ -9,7 +9,6 @@ import (
 	"github.com/adiatma85/own-go-sdk/log"
 	"github.com/adiatma85/own-go-sdk/null"
 	"github.com/adiatma85/own-go-sdk/parser"
-	"github.com/adiatma85/own-go-sdk/redis"
 	"github.com/adiatma85/own-go-sdk/sql"
 )
 
@@ -21,25 +20,25 @@ type Interface interface {
 }
 
 type InitParam struct {
-	Log   log.Interface
-	Db    sql.Interface
-	Json  parser.JSONInterface
-	Redis redis.Interface
+	Log  log.Interface
+	Db   sql.Interface
+	Json parser.JSONInterface
+	// Redis redis.Interface
 }
 
 type role struct {
-	log   log.Interface
-	db    sql.Interface
-	json  parser.JSONInterface
-	redis redis.Interface
+	log  log.Interface
+	db   sql.Interface
+	json parser.JSONInterface
+	// redis redis.Interface
 }
 
 func Init(param InitParam) Interface {
 	r := &role{
-		log:   param.Log,
-		db:    param.Db,
-		json:  param.Json,
-		redis: param.Redis,
+		log:  param.Log,
+		db:   param.Db,
+		json: param.Json,
+		// redis: param.Redis,
 	}
 
 	return r
@@ -61,10 +60,6 @@ func (r *role) Create(ctx context.Context, insertParam entity.CreateRoleParam) (
 
 	if err = tx.Commit(); err != nil {
 		return result, errors.NewWithCode(codes.CodeSQLTxCommit, err.Error())
-	}
-
-	if err := r.deleteCache(ctx); err != nil {
-		r.log.Error(ctx, err)
 	}
 
 	return r.Get(ctx, entity.RoleParam{

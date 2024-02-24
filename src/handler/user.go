@@ -139,8 +139,35 @@ func (r *rest) UserProfile(ctx *gin.Context) {
 // @Tags User
 // @Produce json
 // @Success 200 {object} entity.HTTPResp{}
+// @Param user_change_profile body entity.UpdateUserParam true "user change profile data"
 // @Failure 500 {object} entity.HTTPResp{}
-// @Router /v1/user/profile/self-delete [DELETE]
+// @Router /v1/user/profile [PUT]
+func (r *rest) UpdateUserProfile(ctx *gin.Context) {
+	updateParam := entity.UpdateUserParam{}
+
+	if err := r.Bind(ctx, &updateParam); err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	err := r.uc.User.UpdateUserProfile(ctx.Request.Context(), updateParam)
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	r.httpRespSuccess(ctx, codes.CodeSuccess, nil, nil)
+
+}
+
+// @Summary Self Delete for User
+// @Description Self Delete for User
+// @Security BearerAuth
+// @Tags User
+// @Produce json
+// @Success 200 {object} entity.HTTPResp{}
+// @Failure 500 {object} entity.HTTPResp{}
+// @Router /v1/user/profile [DELETE]
 func (r *rest) UserSelfDelete(ctx *gin.Context) {
 	err := r.uc.User.SelfDelete(ctx.Request.Context())
 	if err != nil {
@@ -156,6 +183,7 @@ func (r *rest) UserSelfDelete(ctx *gin.Context) {
 // @Security BearerAuth
 // @Tags User
 // @Produce json
+// @Param user_change_password body entity.UserChangePassword true "user change password data"
 // @Success 200 {object} entity.HTTPResp{}
 // @Failure 500 {object} entity.HTTPResp{}
 // @Router /v1/user/profile/change-password [PUT]

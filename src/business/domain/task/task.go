@@ -9,7 +9,6 @@ import (
 	"github.com/adiatma85/own-go-sdk/log"
 	"github.com/adiatma85/own-go-sdk/null"
 	"github.com/adiatma85/own-go-sdk/parser"
-	"github.com/adiatma85/own-go-sdk/redis"
 	"github.com/adiatma85/own-go-sdk/sql"
 )
 
@@ -21,25 +20,22 @@ type Interface interface {
 }
 
 type InitParam struct {
-	Log   log.Interface
-	Db    sql.Interface
-	Json  parser.JSONInterface
-	Redis redis.Interface
+	Log  log.Interface
+	Db   sql.Interface
+	Json parser.JSONInterface
 }
 
 type task struct {
-	log   log.Interface
-	db    sql.Interface
-	json  parser.JSONInterface
-	redis redis.Interface
+	log  log.Interface
+	db   sql.Interface
+	json parser.JSONInterface
 }
 
 func Init(param InitParam) Interface {
 	t := &task{
-		log:   param.Log,
-		db:    param.Db,
-		json:  param.Json,
-		redis: param.Redis,
+		log:  param.Log,
+		db:   param.Db,
+		json: param.Json,
 	}
 
 	return t
@@ -61,10 +57,6 @@ func (t *task) Create(ctx context.Context, insertParam entity.CreateTaskParam) (
 
 	if err = tx.Commit(); err != nil {
 		return result, errors.NewWithCode(codes.CodeSQLTxCommit, err.Error())
-	}
-
-	if err := t.deleteCache(ctx); err != nil {
-		t.log.Error(ctx, err)
 	}
 
 	return t.Get(ctx, entity.TaskParam{

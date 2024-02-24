@@ -16,27 +16,27 @@ services:
       - ./caddy_config:/config
   
   # Redis
-  redis:
-    image: redis:6
-    ports:
-      - "6379:6379"
-    restart: on-failure
-    deploy:
-      mode: replicated
-      replicas: 1
-    entrypoint:
-      - "redis-server"
-    volumes:
-      - "./storage/redis/conf:/usr/lib/redis/conf"
-      - "./storage/redis/modules:/usr/lib/redis/modules"
-      - "./storage/redis/data:/data"
+  # redis:
+  #   image: redis:6
+  #   ports:
+  #     - "6379:6379"
+  #   restart: on-failure
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   entrypoint:
+  #     - "redis-server"
+  #   volumes:
+  #     - "./storage/redis/conf:/usr/lib/redis/conf"
+  #     - "./storage/redis/modules:/usr/lib/redis/modules"
+  #     - "./storage/redis/data:/data"
 
   # Main application in here
   gg-project:
     image: adiatma85/gg-project:latest
     depends_on:
       - caddy
-      - redis
+      # - redis
     ports:
       - "8080:8080"
     deploy:

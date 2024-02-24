@@ -56,7 +56,7 @@ type UpdateUserParam struct {
 	RoleId      string      `param:"fk_role_id" db:"fk_role_id" json:"roleId"`
 	Username    string      `param:"username" db:"username" json:"username"`
 	DisplayName string      `param:"display_name" db:"display_name" json:"displayName"`
-	Password    string      `param:"password" db:"password" json:"password"`
+	Password    string      `param:"password" db:"password" json:"-"`
 	Status      null.Int64  `param:"status" db:"status" json:"-" swaggertype:"integer"`
 	UpdatedAt   null.Time   `param:"updated_at" db:"updated_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
 	UpdatedBy   null.String `param:"updated_by" db:"updated_by" json:"-" swaggertype:"string"`

@@ -27,10 +27,10 @@ type Interface interface {
 	GetSelfProfile(ctx context.Context) (entity.User, error)
 	SelfDelete(ctx context.Context) error
 	ChangePassword(ctx context.Context, changePasswordReq entity.ChangePasswordRequest) error
+	UpdateUserProfile(ctx context.Context, updateParam entity.UpdateUserParam) error
 
 	// Improvement kedepannya
 	// CheckPassword(ctx context.Context, params entity.UserCheckPasswordParam, userParam entity.UserParam) (entity.HTTPMessage, error)
-	// ChangePassword(ctx context.Context, passwordChangeParam entity.UserChangePasswordParam, userParam entity.UserParam) (entity.HTTPMessage, error)
 	// Activate(ctx context.Context, selectParam entity.UserParam) error
 	// RefreshToken(ctx context.Context, param entity.UserRefreshTokenParam) (entity.RefreshTokenResponse, error)
 }
@@ -159,9 +159,16 @@ func (u *user) getHashPassowrd(password string) (string, error) {
 	return string(hash), nil
 }
 
-func (u *user) checkHashPassword(hashPassword, password string) bool {
+// Return true if the password is match
+func (u *user) checkHashPassword(ctx context.Context, hashPassword, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password))
-	return err == nil
+
+	if err != nil {
+		u.log.Error(ctx, err)
+		return false
+	}
+
+	return true
 }
 
 func (u *user) SignInWithPassword(ctx context.Context, req entity.UserLoginRequest) (entity.UserLoginResponse, error) {
@@ -181,11 +188,13 @@ func (u *user) SignInWithPassword(ctx context.Context, req entity.UserLoginReque
 		if errors.GetCode(err) == codes.CodeSQLRecordDoesNotExist {
 			return entity.UserLoginResponse{}, errors.NewWithCode(codes.CodeNotFound, "email not found")
 		}
+
+		u.log.Error(ctx, err)
 		return entity.UserLoginResponse{}, err
 	}
 
 	// Validate the password in here
-	if u.checkHashPassword(user.Password, req.Password) {
+	if !u.checkHashPassword(ctx, user.Password, req.Password) {
 		return entity.UserLoginResponse{}, errors.NewWithCode(codes.CodeUnauthorized, "credential does not match")
 	}
 
@@ -267,7 +276,11 @@ func (u *user) ChangePassword(ctx context.Context, changePasswordReq entity.Chan
 		},
 	})
 
-	if u.checkHashPassword(userDn.Password, changePasswordReq.OldPassword) {
+	if err != nil {
+		return err
+	}
+
+	if !u.checkHashPassword(ctx, userDn.Password, changePasswordReq.OldPassword) {
 		return errors.NewWithCode(codes.CodeUnauthorized, "credential does not match")
 	}
 
@@ -286,4 +299,17 @@ func (u *user) ChangePassword(ctx context.Context, changePasswordReq entity.Chan
 	}
 
 	return u.user.Update(ctx, updateParam, selectParam)
+}
+
+func (u *user) UpdateUserProfile(ctx context.Context, updateParam entity.UpdateUserParam) error {
+	user, err := u.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	userParam := entity.UserParam{
+		ID: null.Int64From(user.User.ID),
+	}
+
+	return u.user.Update(ctx, updateParam, userParam)
 }

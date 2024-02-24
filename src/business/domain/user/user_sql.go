@@ -3,13 +3,11 @@ package user
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/adiatma85/gg-project/src/business/entity"
 	"github.com/adiatma85/own-go-sdk/codes"
 	"github.com/adiatma85/own-go-sdk/errors"
 	"github.com/adiatma85/own-go-sdk/query"
-	"github.com/adiatma85/own-go-sdk/redis"
 	"github.com/adiatma85/own-go-sdk/sql"
 )
 
@@ -39,21 +37,6 @@ func (u *user) createSQLUser(tx sql.CommandTx, v entity.CreateUserParam) (sql.Co
 func (u *user) getSQLUser(ctx context.Context, params entity.UserParam) (entity.User, error) {
 	user := entity.User{}
 
-	key, err := u.json.Marshal(params)
-	if err != nil {
-		return user, nil
-	}
-
-	cachedEntry, err := u.getCache(ctx, fmt.Sprintf(getUserByIdKey, string(key)))
-	switch {
-	case errors.Is(err, redis.Nil):
-		u.log.Info(ctx, fmt.Sprintf(entity.ErrorRedisNil, err.Error()))
-	case err != nil:
-		u.log.Error(ctx, fmt.Sprintf(entity.ErrorRedis, err.Error()))
-	default:
-		return cachedEntry, nil
-	}
-
 	qb := query.NewSQLQueryBuilder(u.db, "param", "db", &params.QueryOption)
 	queryExt, queryArgs, _, _, err := qb.Build(&params)
 	if err != nil {
@@ -71,10 +54,6 @@ func (u *user) getSQLUser(ctx context.Context, params entity.UserParam) (entity.
 		return user, errors.NewWithCode(codes.CodeSQLRowScan, err.Error())
 	} else if errors.Is(err, sql.ErrNotFound) {
 		return user, errors.NewWithCode(codes.CodeSQLRecordDoesNotExist, err.Error())
-	}
-
-	if err = u.upsertCache(ctx, fmt.Sprintf(getUserByIdKey, string(key)), user, time.Minute); err != nil {
-		u.log.Error(ctx, err)
 	}
 
 	return user, nil
@@ -138,10 +117,6 @@ func (u *user) updateSQLUser(ctx context.Context, updateParam entity.UpdateUserP
 	}
 
 	u.log.Debug(ctx, fmt.Sprintf("successfully updated user: %v", updateParam))
-
-	if err := u.deleteCache(ctx); err != nil {
-		u.log.Error(ctx, err)
-	}
 
 	return nil
 }

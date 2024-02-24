@@ -19,11 +19,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const (
-	trackingErrorCountMetrics string = "error_count_metrics"
-	eventTrackingMetrics      string = "event_tracking_metrics"
-)
-
 // timeout middleware wraps the request context with a timeout
 func (r *rest) SetTimeout(ctx *gin.Context) {
 	// wrap the request context with a timeout

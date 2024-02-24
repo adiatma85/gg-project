@@ -10,7 +10,6 @@ import (
 	"github.com/adiatma85/own-go-sdk/jwtAuth"
 	"github.com/adiatma85/own-go-sdk/log"
 	"github.com/adiatma85/own-go-sdk/parser"
-	"github.com/adiatma85/own-go-sdk/redis"
 	"github.com/adiatma85/own-go-sdk/sql"
 )
 
@@ -48,14 +47,11 @@ func main() {
 	// init the parser
 	parsers := parser.InitParser(log, cfg.Parser)
 
-	// init the redis
-	cache := redis.Init(cfg.Redis, log)
-
 	// Init the jwt
 	jwt := jwtAuth.Init(cfg.JwtAuth)
 
 	// Init the domain
-	d := domain.Init(domain.InitParam{Log: log, Db: db, Json: parsers.JSONParser(), Redis: cache})
+	d := domain.Init(domain.InitParam{Log: log, Db: db, Json: parsers.JSONParser()})
 
 	// Init the usecase
 	uc := usecase.Init(usecase.InitParam{Log: log, Dom: d, JwtAuth: jwt})
