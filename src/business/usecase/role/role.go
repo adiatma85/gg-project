@@ -35,7 +35,11 @@ type role struct {
 var Now = time.Now
 
 func Init(param InitParam) Interface {
-	r := &role{}
+	r := &role{
+		log:     param.Log,
+		role:    param.Role,
+		jwtAuth: param.JwtAuth,
+	}
 
 	return r
 }
