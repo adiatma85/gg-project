@@ -183,7 +183,7 @@ func (r *rest) UserSelfDelete(ctx *gin.Context) {
 // @Security BearerAuth
 // @Tags User
 // @Produce json
-// @Param user_change_password body entity.UserChangePassword true "user change password data"
+// @Param user_change_password body entity.ChangePasswordRequest true "user change password data"
 // @Success 200 {object} entity.HTTPResp{}
 // @Failure 500 {object} entity.HTTPResp{}
 // @Router /v1/user/profile/change-password [PUT]

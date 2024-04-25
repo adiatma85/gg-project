@@ -3,12 +3,12 @@ module github.com/adiatma85/gg-project
 go 1.21
 
 require (
-	github.com/adiatma85/own-go-sdk v0.1.9
+	github.com/adiatma85/own-go-sdk v0.1.12
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.3.2
 	github.com/swaggo/swag v1.16.2
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.21.0
 )
 
 require (
@@ -36,7 +36,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.5.0 // indirect
-	golang.org/x/net v0.16.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -83,9 +83,9 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
-	google.golang.org/protobuf v1.31.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
