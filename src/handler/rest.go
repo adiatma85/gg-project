@@ -168,7 +168,7 @@ func (r *rest) Run() {
 			r.log.Error(ctx, fmt.Sprintf("Serving HTTP error: %s", err.Error()))
 		}
 	}()
-	r.log.Info(ctx, fmt.Sprintf("Listening and Serving HTTP on %s", srv.Addr))
+	r.log.Info(ctx, fmt.Sprintf("Listening and Serving HTTP on %s", fmt.Sprintf("http://%v%v", r.conf.Host , srv.Addr)))
 
 	// Listen for the interrupt signal.
 	<-ctx.Done()
@@ -261,7 +261,7 @@ func (r *rest) registerSwaggerRoutes() {
 			r.conf.Swagger.BasicAuth.Username: r.conf.Swagger.BasicAuth.Password,
 		}
 
-		isDarkMode := ginSwagger.SetDarkMode(r.conf.Swagger.IsDarkMode)
+		isDarkMode := ginSwagger.SetDarkMode(true)
 		r.http.GET(fmt.Sprintf("%s/*any", r.conf.Swagger.Path),
 			gin.BasicAuthForRealm(swaggerAuth, "Restricted"),
 			ginSwagger.WrapHandler(swaggerfiles.Handler, isDarkMode))
