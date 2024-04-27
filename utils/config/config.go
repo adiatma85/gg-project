@@ -31,6 +31,7 @@ type ApplicationMeta struct {
 }
 
 type GinConfig struct {
+	Host			string
 	Port            string
 	Mode            string
 	LogRequest      bool
