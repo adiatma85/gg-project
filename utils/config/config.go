@@ -55,9 +55,10 @@ type CORSConfig struct {
 	Mode string
 }
 type SwaggerConfig struct {
-	Enabled   bool
-	Path      string
-	BasicAuth BasicAuthConf
+	Enabled    bool
+	Path       string
+	BasicAuth  BasicAuthConf
+	IsDarkMode bool
 }
 
 type PlatformConfig struct {

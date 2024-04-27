@@ -24,7 +24,8 @@
                 "Username": "admon"
             },
             "Enabled": "true",
-            "Path": "/swagger"
+            "Path": "/swagger",
+            "IsDarkMode": "true"
         },
         "Platform": {
             "BasicAuth": {
