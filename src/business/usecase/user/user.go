@@ -71,7 +71,12 @@ func (u *user) Create(ctx context.Context, req entity.CreateUserParam) (entity.U
 	req.CreatedBy = null.StringFrom(fmt.Sprintf("%v", entity.SystemUser))
 	req.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", entity.SystemUser))
 
-	return u.user.Create(ctx, req)
+	result, err = u.user.Create(ctx, req)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
 }
 
 func (u *user) CreateWithoutAuthInfo(ctx context.Context, req entity.CreateUserParam) (entity.User, error) {
@@ -89,7 +94,12 @@ func (u *user) CreateWithoutAuthInfo(ctx context.Context, req entity.CreateUserP
 		return result, err
 	}
 
-	return u.user.Create(ctx, req)
+	result, err = u.user.Create(ctx, req)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
 }
 
 func (u *user) validateUser(ctx context.Context, req entity.CreateUserParam) (entity.User, error) {
