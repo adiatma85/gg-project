@@ -111,9 +111,14 @@ func (u *user) updateSQLUser(ctx context.Context, updateParam entity.UpdateUserP
 		return errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	_, err = u.db.Leader().Exec(ctx, "uProfile", updateUser+queryUpdate, args...)
+	res, err := u.db.Leader().Exec(ctx, "uProfile", updateUser+queryUpdate, args...)
 	if err != nil {
 		return errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
+	}
+
+	rowCount, err := res.RowsAffected()
+	if err != nil || rowCount < 1 {
+		return errors.NewWithCode(codes.CodeSQLNoRowsAffected, "no rows affected")
 	}
 
 	u.log.Debug(ctx, fmt.Sprintf("successfully updated user: %v", updateParam))
