@@ -43,7 +43,7 @@ func (u *user) getSQLUser(ctx context.Context, params entity.UserParam) (entity.
 		return user, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	row, err := u.db.Follower().QueryRow(ctx, "rUserByID", getUser+queryExt, queryArgs...)
+	row, err := u.db.Follower().QueryRow(ctx, "rUserByID", readUser+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return user, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	} else if errors.Is(err, sql.ErrNotFound) {
@@ -68,7 +68,7 @@ func (u *user) getSQLUserList(ctx context.Context, params entity.UserParam) ([]e
 		return users, nil, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	rows, err := u.db.Follower().Query(ctx, "rListUser", getUser+queryExt, queryArgs...)
+	rows, err := u.db.Follower().Query(ctx, "rListUser", readUser+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return users, nil, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	}
@@ -79,7 +79,7 @@ func (u *user) getSQLUserList(ctx context.Context, params entity.UserParam) ([]e
 		temp := entity.User{}
 		if err := rows.StructScan(&temp); err != nil {
 			u.log.Error(ctx, errors.NewWithCode(codes.CodeSQLRowScan, err.Error()))
-			continue
+			return users, nil, err
 		}
 		users = append(users, temp)
 	}
