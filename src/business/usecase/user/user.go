@@ -116,6 +116,7 @@ func (u *user) validateUser(ctx context.Context, req entity.CreateUserParam) (en
 		return result, err
 	}
 
+	// Fix this logic...
 	if user != result {
 		return result, errors.NewWithCode(codes.CodeConflict, "email is exists")
 	}
