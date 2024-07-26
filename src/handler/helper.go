@@ -236,7 +236,7 @@ func (r *rest) VerifyUser(ctx *gin.Context) {
 	ctx.Next()
 }
 
-// Create a function to validate refresh token instead access token in here
+// TODO: Create a function to validate refresh token instead access token in here
 
 func (r *rest) verifyUserAuth(ctx *gin.Context) (entity.User, error) {
 	var (
