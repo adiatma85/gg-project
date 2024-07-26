@@ -236,6 +236,8 @@ func (r *rest) VerifyUser(ctx *gin.Context) {
 	ctx.Next()
 }
 
+// Create a function to validate refresh token instead access token in here
+
 func (r *rest) verifyUserAuth(ctx *gin.Context) (entity.User, error) {
 	var (
 		user entity.User
@@ -246,7 +248,7 @@ func (r *rest) verifyUserAuth(ctx *gin.Context) (entity.User, error) {
 		return entity.User{}, errors.NewWithCode(codes.CodeUnauthorized, "empty token")
 	}
 
-	jwtUer, err := r.jwtAuth.ValidateToken(token)
+	jwtUer, err := r.jwtAuth.ValidateAccessToken(token)
 	if err != nil {
 		return entity.User{}, errors.NewWithCode(codes.CodeUnauthorized, "token invalid or token expire")
 	}

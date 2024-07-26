@@ -13,11 +13,16 @@ import (
 )
 
 type Interface interface {
+	// Public
 	Create(ctx context.Context, req entity.CreateCategoryParam) (entity.Category, error)
 	Get(ctx context.Context, params entity.CategoryParam) (entity.Category, error)
 	GetList(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error)
 	Update(ctx context.Context, updateParam entity.UpdateCategoryParam, selectParam entity.CategoryParam) error
 	Delete(ctx context.Context, selectParam entity.CategoryParam) error
+
+	// Admin
+	GetAsAdmin(ctx context.Context, params entity.CategoryParam) (entity.Category, error)
+	GetListAsAdmin(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error)
 }
 
 type InitParam struct {
@@ -57,10 +62,27 @@ func (c *category) Create(ctx context.Context, req entity.CreateCategoryParam) (
 }
 
 func (c *category) Get(ctx context.Context, params entity.CategoryParam) (entity.Category, error) {
+	params.QueryOption.IsActive = true
+	return c.category.Get(ctx, params)
+}
+
+func (c *category) GetAsAdmin(ctx context.Context, params entity.CategoryParam) (entity.Category, error) {
 	return c.category.Get(ctx, params)
 }
 
 func (c *category) GetList(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error) {
+	params.IncludePagination = true
+	params.QueryOption.IsActive = true
+
+	categories, pg, err := c.category.GetList(ctx, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return categories, pg, nil
+}
+
+func (c *category) GetListAsAdmin(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error) {
 	params.IncludePagination = true
 	params.QueryOption.IsActive = true
 
