@@ -23,6 +23,7 @@ type Interface interface {
 	// Admin
 	GetAsAdmin(ctx context.Context, params entity.CategoryParam) (entity.Category, error)
 	GetListAsAdmin(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error)
+	Activate(ctx context.Context, selectParam entity.CategoryParam) error
 }
 
 type InitParam struct {
@@ -84,7 +85,6 @@ func (c *category) GetList(ctx context.Context, params entity.CategoryParam) ([]
 
 func (c *category) GetListAsAdmin(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error) {
 	params.IncludePagination = true
-	params.QueryOption.IsActive = true
 
 	categories, pg, err := c.category.GetList(ctx, params)
 	if err != nil {
@@ -95,7 +95,6 @@ func (c *category) GetListAsAdmin(ctx context.Context, params entity.CategoryPar
 }
 
 func (c *category) Update(ctx context.Context, updateParam entity.UpdateCategoryParam, selectParam entity.CategoryParam) error {
-
 	user, err := c.jwtAuth.GetUserAuthInfo(ctx)
 	if err != nil {
 		return err
@@ -120,4 +119,19 @@ func (c *category) Delete(ctx context.Context, selectParam entity.CategoryParam)
 	}
 
 	return c.category.Update(ctx, deleteParam, selectParam)
+}
+
+func (c *category) Activate(ctx context.Context, selectParam entity.CategoryParam) error {
+	user, err := c.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	activateParam := entity.UpdateCategoryParam{
+		Status:    null.Int64From(1),
+		UpdatedAt: null.TimeFrom(Now()),
+		UpdatedBy: null.StringFrom(fmt.Sprintf("%v", user.User.ID)),
+	}
+
+	return c.category.Update(ctx, activateParam, selectParam)
 }

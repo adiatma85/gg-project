@@ -1,4 +1,4 @@
-package category
+package task
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	mock_category_dom "github.com/adiatma85/gg-project/src/business/domain/mock/category"
+	mock_task_dom "github.com/adiatma85/gg-project/src/business/domain/mock/task"
 	"github.com/adiatma85/gg-project/src/business/entity"
 	"github.com/adiatma85/own-go-sdk/jwtAuth"
 	"github.com/adiatma85/own-go-sdk/null"
@@ -18,12 +18,12 @@ import (
 )
 
 type mockInterface struct {
-	logger      *mock_log.MockInterface
-	categoryDom *mock_category_dom.MockInterface
-	jwtAuth     *mock_jwt_auth.MockInterface
+	logger  *mock_log.MockInterface
+	taskDom *mock_task_dom.MockInterface
+	jwtAuth *mock_jwt_auth.MockInterface
 }
 
-func initMockTest(t *testing.T) (Interface, category, mockInterface) {
+func initMockTest(t *testing.T) (Interface, task, mockInterface) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -32,37 +32,37 @@ func initMockTest(t *testing.T) (Interface, category, mockInterface) {
 	logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
 	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
 
-	mockCategoryDom := mock_category_dom.NewMockInterface(ctrl)
+	mockTaskDom := mock_task_dom.NewMockInterface(ctrl)
 	mockJwtAuth := mock_jwt_auth.NewMockInterface(ctrl)
 
 	ucInterface := Init(InitParam{
-		Log:      logger,
-		Category: mockCategoryDom,
-		JwtAuth:  mockJwtAuth,
+		Log:     logger,
+		Task:    mockTaskDom,
+		JwtAuth: mockJwtAuth,
 	})
 
-	ucStruct := category{
-		log:      logger,
-		category: mockCategoryDom,
-		jwtAuth:  mockJwtAuth,
+	ucStruct := task{
+		log:     logger,
+		task:    mockTaskDom,
+		jwtAuth: mockJwtAuth,
 	}
 
 	mockInterface := mockInterface{
-		logger:      logger,
-		categoryDom: mockCategoryDom,
-		jwtAuth:     mockJwtAuth,
+		logger:  logger,
+		taskDom: mockTaskDom,
+		jwtAuth: mockJwtAuth,
 	}
 
 	return ucInterface, ucStruct, mockInterface
 }
 
-func Test_category_Create(t *testing.T) {
+func Test_task_Create(t *testing.T) {
 	usecase, _, mocks := initMockTest(t)
 
 	// Type in here
 	type args struct {
 		ctx context.Context
-		req entity.CreateCategoryParam
+		req entity.CreateTaskParam
 	}
 
 	// Mock in here
@@ -70,8 +70,9 @@ func Test_category_Create(t *testing.T) {
 	Now = func() time.Time {
 		return mockTime
 	}
-	mockCreateCategoryArgs := entity.CreateCategoryParam{
-		Name: "Ini adalah nama yang panjang dan lebar",
+
+	mockCreateTaskArgs := entity.CreateTaskParam{
+		Title: "Title yang panjang dan lebar",
 	}
 
 	mockUserInfo := jwtAuth.UserAuthInfo{
@@ -80,20 +81,21 @@ func Test_category_Create(t *testing.T) {
 		},
 	}
 
-	mockFinalInserParam := entity.CreateCategoryParam{
-		Name:      "Ini adalah nama yang panjang dan lebar",
+	mockFinalInserParam := entity.CreateTaskParam{
+		Title:     "Title yang panjang dan lebar",
+		UserId:    10,
 		CreatedBy: null.StringFrom("10"),
 		UpdatedBy: null.StringFrom("10"),
 	}
 
-	mockCategoryResult := entity.Category{
+	mockTaskResult := entity.Task{
 		ID:        1,
-		Name:      "Ini adalah nama yang panjang dan lebar",
+		Title:     "Title yang panjang dan lebar",
 		CreatedBy: null.StringFrom("10"),
 		UpdatedBy: null.StringFrom("10"),
 		CreatedAt: null.TimeFrom(mockTime),
 		UpdatedAt: null.TimeFrom(mockTime),
-		Status:    null.Int64From(1),
+		Status:    1,
 	}
 
 	// Test cases in here
@@ -101,50 +103,50 @@ func Test_category_Create(t *testing.T) {
 		name     string
 		arg      args
 		mockFunc func(mock mockInterface, arg args)
-		want     entity.Category
+		want     entity.Task
 		wantErr  bool
 	}{
 		{
 			name: "failed to get user info",
 			arg: args{
 				ctx: context.Background(),
-				req: mockCreateCategoryArgs,
+				req: mockCreateTaskArgs,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(jwtAuth.UserAuthInfo{}, assert.AnError)
 			},
-			want:    entity.Category{},
+			want:    entity.Task{},
 			wantErr: true,
 		},
 		{
-			name: "failed to insert new category to category domain",
+			name: "failed to insert new task to task domain",
 			arg: args{
 				ctx: context.Background(),
-				req: mockCreateCategoryArgs,
+				req: mockCreateTaskArgs,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
-				mock.categoryDom.EXPECT().Create(arg.ctx, mockFinalInserParam).Return(entity.Category{}, assert.AnError)
+				mock.taskDom.EXPECT().Create(arg.ctx, mockFinalInserParam).Return(entity.Task{}, assert.AnError)
 			},
-			want:    entity.Category{},
+			want:    entity.Task{},
 			wantErr: true,
 		},
 		{
 			name: "success",
 			arg: args{
 				ctx: context.Background(),
-				req: mockCreateCategoryArgs,
+				req: mockCreateTaskArgs,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
-				mock.categoryDom.EXPECT().Create(arg.ctx, mockFinalInserParam).Return(mockCategoryResult, nil)
+				mock.taskDom.EXPECT().Create(arg.ctx, mockFinalInserParam).Return(mockTaskResult, nil)
 			},
-			want:    mockCategoryResult,
+			want:    mockTaskResult,
 			wantErr: false,
 		},
 	}
 
-	// Iterate the tests in here
+	// Iterate the test cases in here
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc(mocks, tt.arg)
@@ -164,27 +166,34 @@ func Test_category_Create(t *testing.T) {
 	}
 }
 
-func Test_category_Get(t *testing.T) {
+func Test_task_Get(t *testing.T) {
 	usecase, _, mocks := initMockTest(t)
 
 	// Type in here
 	type args struct {
 		ctx    context.Context
-		params entity.CategoryParam
+		params entity.TaskParam
 	}
 
 	// Mock in here
-	mockCategoryParam := entity.CategoryParam{
-		ID: null.Int64From(1),
+	mockUserInfo := jwtAuth.UserAuthInfo{
+		User: jwtAuth.User{
+			ID: 10,
+		},
+	}
+
+	mockTaskParam := entity.TaskParam{
+		ID:     null.Int64From(1),
+		UserId: null.Int64From(10),
 		QueryOption: query.Option{
 			IsActive: true,
 		},
 	}
 
-	mockCategoryResult := entity.Category{
+	mockTaskResult := entity.Task{
 		ID:     1,
-		Name:   "Nama Kategori yang panjang dan lebar",
-		Status: null.Int64From(1),
+		Title:  "Nama Kategori yang panjang dan lebar",
+		Status: 1,
 	}
 
 	// Test cases in here
@@ -192,36 +201,50 @@ func Test_category_Get(t *testing.T) {
 		name     string
 		arg      args
 		mockFunc func(mock mockInterface, arg args)
-		want     entity.Category
+		want     entity.Task
 		wantErr  bool
 	}{
 		{
-			name: "failed to get from category domain",
+			name: "failed to get user info",
 			arg: args{
 				ctx:    context.Background(),
-				params: mockCategoryParam,
+				params: mockTaskParam,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
-				mock.categoryDom.EXPECT().Get(arg.ctx, mockCategoryParam).Return(entity.Category{}, assert.AnError)
+				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(jwtAuth.UserAuthInfo{}, assert.AnError)
 			},
-			want:    entity.Category{},
+			want:    entity.Task{},
+			wantErr: true,
+		},
+		{
+			name: "failed to get from task domain",
+			arg: args{
+				ctx:    context.Background(),
+				params: mockTaskParam,
+			},
+			mockFunc: func(mock mockInterface, arg args) {
+				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
+				mock.taskDom.EXPECT().Get(arg.ctx, mockTaskParam).Return(entity.Task{}, assert.AnError)
+			},
+			want:    entity.Task{},
 			wantErr: true,
 		},
 		{
 			name: "success",
 			arg: args{
 				ctx:    context.Background(),
-				params: mockCategoryParam,
+				params: mockTaskParam,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
-				mock.categoryDom.EXPECT().Get(arg.ctx, mockCategoryParam).Return(mockCategoryResult, nil)
+				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
+				mock.taskDom.EXPECT().Get(arg.ctx, mockTaskParam).Return(mockTaskResult, nil)
 			},
-			want:    mockCategoryResult,
+			want:    mockTaskResult,
 			wantErr: false,
 		},
 	}
 
-	// Iterate the tests in here
+	// Iterate the test cases in here
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc(mocks, tt.arg)
@@ -241,92 +264,25 @@ func Test_category_Get(t *testing.T) {
 	}
 }
 
-func Test_category_GetAsAdmin(t *testing.T) {
+func Test_task_GetList(t *testing.T) {
 	usecase, _, mocks := initMockTest(t)
 
 	// Type in here
 	type args struct {
 		ctx    context.Context
-		params entity.CategoryParam
+		params entity.TaskParam
 	}
 
-	// Mock in here
-	mockCategoryParam := entity.CategoryParam{
-		ID: null.Int64From(1),
-	}
-
-	mockCategoryResult := entity.Category{
-		ID:     1,
-		Name:   "Nama Kategori yang panjang dan lebar",
-		Status: null.Int64From(1),
-	}
-
-	// Test cases in here
-	tests := []struct {
-		name     string
-		arg      args
-		mockFunc func(mock mockInterface, arg args)
-		want     entity.Category
-		wantErr  bool
-	}{
-		{
-			name: "failed to get from category domain",
-			arg: args{
-				ctx:    context.Background(),
-				params: mockCategoryParam,
-			},
-			mockFunc: func(mock mockInterface, arg args) {
-				mock.categoryDom.EXPECT().Get(arg.ctx, mockCategoryParam).Return(entity.Category{}, assert.AnError)
-			},
-			want:    entity.Category{},
-			wantErr: true,
-		},
-		{
-			name: "success",
-			arg: args{
-				ctx:    context.Background(),
-				params: mockCategoryParam,
-			},
-			mockFunc: func(mock mockInterface, arg args) {
-				mock.categoryDom.EXPECT().Get(arg.ctx, mockCategoryParam).Return(mockCategoryResult, nil)
-			},
-			want:    mockCategoryResult,
-			wantErr: false,
+	// Mock In here
+	mockUserInfo := jwtAuth.UserAuthInfo{
+		User: jwtAuth.User{
+			ID: 10,
 		},
 	}
 
-	// Iterate the tests in here
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.mockFunc(mocks, tt.arg)
-
-			got, err := usecase.GetAsAdmin(tt.arg.ctx, tt.arg.params)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("usecase.GetAsAdmin() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-			if !reflect.DeepEqual(got, tt.want) {
-				assert.Equal(t, tt.want, got)
-				t.Errorf("usecase.GetAsAdmin() got = %v, want %v", got, tt.want)
-				return
-			}
-		})
-	}
-}
-
-func Test_category_GetList(t *testing.T) {
-	usecase, _, mocks := initMockTest(t)
-
-	// Type in here
-	type args struct {
-		ctx    context.Context
-		params entity.CategoryParam
-	}
-
-	// Mock in here
-	mockParams := entity.CategoryParam{
-		ID: null.Int64From(1),
+	mockParams := entity.TaskParam{
+		ID:     null.Int64From(1),
+		UserId: null.Int64From(10),
 		PaginationParam: entity.PaginationParam{
 			IncludePagination: true,
 		},
@@ -342,10 +298,10 @@ func Test_category_GetList(t *testing.T) {
 		TotalElements:   1,
 	}
 
-	mockResult := []entity.Category{
+	mockResult := []entity.Task{
 		{
 			ID:     1,
-			Status: null.Int64From(1),
+			Status: 1,
 		},
 	}
 
@@ -354,22 +310,21 @@ func Test_category_GetList(t *testing.T) {
 		name       string
 		arg        args
 		mockFunc   func(mock mockInterface, arg args)
-		want       []entity.Category
+		want       []entity.Task
 		pagination *entity.Pagination
 		wantErr    bool
 	}{
 		{
-			name: "error fetching from domain",
+			name: "failed to get user info",
 			arg: args{
 				ctx:    context.Background(),
 				params: mockParams,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
-				mock.categoryDom.EXPECT().GetList(arg.ctx, mockParams).Return([]entity.Category{}, nil, assert.AnError)
+				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(jwtAuth.UserAuthInfo{}, assert.AnError)
 			},
-			want:       nil,
-			pagination: nil,
-			wantErr:    true,
+			want:    []entity.Task{},
+			wantErr: true,
 		},
 		{
 			name: "error fetching from domain",
@@ -378,7 +333,22 @@ func Test_category_GetList(t *testing.T) {
 				params: mockParams,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
-				mock.categoryDom.EXPECT().GetList(arg.ctx, mockParams).Return(mockResult, &mockPagination, nil)
+				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
+				mock.taskDom.EXPECT().GetList(arg.ctx, mockParams).Return([]entity.Task{}, nil, assert.AnError)
+			},
+			want:       []entity.Task{},
+			pagination: nil,
+			wantErr:    true,
+		},
+		{
+			name: "success",
+			arg: args{
+				ctx:    context.Background(),
+				params: mockParams,
+			},
+			mockFunc: func(mock mockInterface, arg args) {
+				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
+				mock.taskDom.EXPECT().GetList(arg.ctx, mockParams).Return(mockResult, &mockPagination, nil)
 			},
 			want:       mockResult,
 			pagination: &mockPagination,
@@ -386,7 +356,7 @@ func Test_category_GetList(t *testing.T) {
 		},
 	}
 
-	// Iterate the tests cases in here
+	// Iterate the test in here
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc(mocks, tt.arg)
@@ -412,108 +382,14 @@ func Test_category_GetList(t *testing.T) {
 	}
 }
 
-func Test_category_GetListAsAdmin(t *testing.T) {
-	usecase, _, mocks := initMockTest(t)
-
-	// Type in here
-	type args struct {
-		ctx    context.Context
-		params entity.CategoryParam
-	}
-
-	// Mock in here
-	mockParams := entity.CategoryParam{
-		ID: null.Int64From(1),
-		PaginationParam: entity.PaginationParam{
-			IncludePagination: true,
-		},
-	}
-
-	mockPagination := entity.Pagination{
-		CurrentPage:     1,
-		CurrentElements: 1,
-		TotalPages:      1,
-		TotalElements:   1,
-	}
-
-	mockResult := []entity.Category{
-		{
-			ID:     1,
-			Status: null.Int64From(1),
-		},
-	}
-
-	// Test cases in here
-	tests := []struct {
-		name       string
-		arg        args
-		mockFunc   func(mock mockInterface, arg args)
-		want       []entity.Category
-		pagination *entity.Pagination
-		wantErr    bool
-	}{
-		{
-			name: "error fetching from domain",
-			arg: args{
-				ctx:    context.Background(),
-				params: mockParams,
-			},
-			mockFunc: func(mock mockInterface, arg args) {
-				mock.categoryDom.EXPECT().GetList(arg.ctx, mockParams).Return([]entity.Category{}, nil, assert.AnError)
-			},
-			want:       nil,
-			pagination: nil,
-			wantErr:    true,
-		},
-		{
-			name: "error fetching from domain",
-			arg: args{
-				ctx:    context.Background(),
-				params: mockParams,
-			},
-			mockFunc: func(mock mockInterface, arg args) {
-				mock.categoryDom.EXPECT().GetList(arg.ctx, mockParams).Return(mockResult, &mockPagination, nil)
-			},
-			want:       mockResult,
-			pagination: &mockPagination,
-			wantErr:    false,
-		},
-	}
-
-	// Iterate the tests cases in here
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.mockFunc(mocks, tt.arg)
-
-			got, pagination, err := usecase.GetListAsAdmin(tt.arg.ctx, tt.arg.params)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("usecase.GetListAsAdmin() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-			if !reflect.DeepEqual(got, tt.want) {
-				assert.Equal(t, tt.want, got)
-				t.Errorf("usecase.GetListAsAdmin() got = %v, want %v", got, tt.want)
-				return
-			}
-
-			if !reflect.DeepEqual(pagination, tt.pagination) {
-				assert.Equal(t, tt.pagination, pagination)
-				t.Errorf("usecase.GetListAsAdmin() got = %v, want %v", pagination, tt.pagination)
-				return
-			}
-		})
-	}
-}
-
-func Test_category_Update(t *testing.T) {
+func Test_task_Update(t *testing.T) {
 	usecase, _, mocks := initMockTest(t)
 
 	// Type in here
 	type args struct {
 		ctx         context.Context
-		updateParam entity.UpdateCategoryParam
-		selectParam entity.CategoryParam
+		updateParam entity.UpdateTaskParam
+		selectParam entity.TaskParam
 	}
 
 	// Mock in here
@@ -521,11 +397,12 @@ func Test_category_Update(t *testing.T) {
 	Now = func() time.Time {
 		return mockTime
 	}
-	mockUpdateArgs := entity.UpdateCategoryParam{
-		Name: "Nama yang diganti",
+
+	mockUpdateArgs := entity.UpdateTaskParam{
+		Title: "Title yang panjang dan lebar",
 	}
 
-	mockSelectArgs := entity.CategoryParam{
+	mockSelectArgs := entity.TaskParam{
 		ID: null.Int64From(1),
 		QueryOption: query.Option{
 			IsActive: true,
@@ -538,8 +415,8 @@ func Test_category_Update(t *testing.T) {
 		},
 	}
 
-	mockUpdateParam := entity.UpdateCategoryParam{
-		Name:      "Nama yang diganti",
+	mockUpdateParam := entity.UpdateTaskParam{
+		Title:     "Title yang panjang dan lebar",
 		UpdatedAt: null.TimeFrom(mockTime),
 		UpdatedBy: null.StringFrom("10"),
 	}
@@ -564,7 +441,7 @@ func Test_category_Update(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "failed to update to category domain",
+			name: "failed to update to task domain",
 			arg: args{
 				ctx:         context.Background(),
 				updateParam: mockUpdateArgs,
@@ -572,7 +449,7 @@ func Test_category_Update(t *testing.T) {
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
-				mock.categoryDom.EXPECT().Update(arg.ctx, mockUpdateParam, mockSelectArgs).Return(assert.AnError)
+				mock.taskDom.EXPECT().Update(arg.ctx, mockUpdateParam, mockSelectArgs).Return(assert.AnError)
 			},
 			wantErr: true,
 		},
@@ -585,7 +462,7 @@ func Test_category_Update(t *testing.T) {
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
-				mock.categoryDom.EXPECT().Update(arg.ctx, mockUpdateParam, mockSelectArgs).Return(nil)
+				mock.taskDom.EXPECT().Update(arg.ctx, mockUpdateParam, mockSelectArgs).Return(nil)
 			},
 			wantErr: false,
 		},
@@ -605,13 +482,13 @@ func Test_category_Update(t *testing.T) {
 	}
 }
 
-func Test_category_Delete(t *testing.T) {
+func Test_task_Delete(t *testing.T) {
 	usecase, _, mocks := initMockTest(t)
 
 	// Type in here
 	type args struct {
 		ctx         context.Context
-		selectParam entity.CategoryParam
+		selectParam entity.TaskParam
 	}
 
 	// Mock in here
@@ -620,7 +497,7 @@ func Test_category_Delete(t *testing.T) {
 		return mockTime
 	}
 
-	mockSelectArgs := entity.CategoryParam{
+	mockSelectArgs := entity.TaskParam{
 		ID: null.Int64From(1),
 		QueryOption: query.Option{
 			IsActive: true,
@@ -633,7 +510,7 @@ func Test_category_Delete(t *testing.T) {
 		},
 	}
 
-	mockDeleteParam := entity.UpdateCategoryParam{
+	mockDeleteParam := entity.UpdateTaskParam{
 		Status:    null.Int64From(-1),
 		DeletedAt: null.TimeFrom(mockTime),
 		DeletedBy: null.StringFrom("10"),
@@ -658,14 +535,14 @@ func Test_category_Delete(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "failed to update to category domain",
+			name: "failed to update to task domain",
 			arg: args{
 				ctx:         context.Background(),
 				selectParam: mockSelectArgs,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
-				mock.categoryDom.EXPECT().Update(arg.ctx, mockDeleteParam, mockSelectArgs).Return(assert.AnError)
+				mock.taskDom.EXPECT().Update(arg.ctx, mockDeleteParam, mockSelectArgs).Return(assert.AnError)
 			},
 			wantErr: true,
 		},
@@ -677,13 +554,13 @@ func Test_category_Delete(t *testing.T) {
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
-				mock.categoryDom.EXPECT().Update(arg.ctx, mockDeleteParam, mockSelectArgs).Return(nil)
+				mock.taskDom.EXPECT().Update(arg.ctx, mockDeleteParam, mockSelectArgs).Return(nil)
 			},
 			wantErr: false,
 		},
 	}
 
-	// Iterate the test in here
+	// Iterate the test cases in here
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc(mocks, tt.arg)
@@ -697,13 +574,13 @@ func Test_category_Delete(t *testing.T) {
 	}
 }
 
-func Test_category_Activate(t *testing.T) {
+func Test_task_Activate(t *testing.T) {
 	usecase, _, mocks := initMockTest(t)
 
 	// Type in here
 	type args struct {
 		ctx         context.Context
-		selectParam entity.CategoryParam
+		selectParam entity.TaskParam
 	}
 
 	// Mock in here
@@ -712,7 +589,7 @@ func Test_category_Activate(t *testing.T) {
 		return mockTime
 	}
 
-	mockSelectArgs := entity.CategoryParam{
+	mockSelectArgs := entity.TaskParam{
 		ID: null.Int64From(1),
 		QueryOption: query.Option{
 			IsActive: true,
@@ -725,7 +602,7 @@ func Test_category_Activate(t *testing.T) {
 		},
 	}
 
-	mockActivateParam := entity.UpdateCategoryParam{
+	mockActivateParam := entity.UpdateTaskParam{
 		Status:    null.Int64From(1),
 		UpdatedAt: null.TimeFrom(mockTime),
 		UpdatedBy: null.StringFrom("10"),
@@ -750,14 +627,14 @@ func Test_category_Activate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "failed to update to category domain",
+			name: "failed to update to role domain",
 			arg: args{
 				ctx:         context.Background(),
 				selectParam: mockSelectArgs,
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
-				mock.categoryDom.EXPECT().Update(arg.ctx, mockActivateParam, mockSelectArgs).Return(assert.AnError)
+				mock.taskDom.EXPECT().Update(arg.ctx, mockActivateParam, mockSelectArgs).Return(assert.AnError)
 			},
 			wantErr: true,
 		},
@@ -769,13 +646,13 @@ func Test_category_Activate(t *testing.T) {
 			},
 			mockFunc: func(mock mockInterface, arg args) {
 				mock.jwtAuth.EXPECT().GetUserAuthInfo(arg.ctx).Return(mockUserInfo, nil)
-				mock.categoryDom.EXPECT().Update(arg.ctx, mockActivateParam, mockSelectArgs).Return(nil)
+				mock.taskDom.EXPECT().Update(arg.ctx, mockActivateParam, mockSelectArgs).Return(nil)
 			},
 			wantErr: false,
 		},
 	}
 
-	// Iterate the test in here
+	// Iterate the test cases in here
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFunc(mocks, tt.arg)

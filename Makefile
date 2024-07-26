@@ -24,6 +24,11 @@ build-alpine:
 run: swaggo build
 	@./build/app
 
+.PHONY: run-tests
+run-tests:
+	@go clean -cache
+	@go test -v -failfast `go list ./... | grep -i 'business'` -cover
+
 .PHONY: mock-install
 mock-install:
 	@go install go.uber.org/mock/mockgen@v0.4.0
