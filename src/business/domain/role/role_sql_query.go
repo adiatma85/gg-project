@@ -4,7 +4,7 @@ const (
 	createRole = `INSERT INTO role (name, type, rank, created_by, updated_by)
 	VALUES (:name, :type, :rank, :created_by, :updated_by)`
 
-	getRole = `
+	readRole = `
 		SELECT
 			id,
 			name,

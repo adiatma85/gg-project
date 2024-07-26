@@ -18,6 +18,11 @@ type Interface interface {
 	GetList(ctx context.Context, params entity.RoleParam) ([]entity.Role, *entity.Pagination, error)
 	Update(ctx context.Context, updateParam entity.UpdateRoleParam, selectParam entity.RoleParam) error
 	Delete(ctx context.Context, selectParam entity.RoleParam) error
+
+	// Admin
+	GetAsAdmin(ctx context.Context, params entity.RoleParam) (entity.Role, error)
+	GetListAsAdmin(ctx context.Context, params entity.RoleParam) ([]entity.Role, *entity.Pagination, error)
+	Activate(ctx context.Context, selectParam entity.RoleParam) error
 }
 
 type InitParam struct {
@@ -61,6 +66,10 @@ func (r *role) Get(ctx context.Context, params entity.RoleParam) (entity.Role, e
 	return r.role.Get(ctx, params)
 }
 
+func (r *role) GetAsAdmin(ctx context.Context, params entity.RoleParam) (entity.Role, error) {
+	return r.role.Get(ctx, params)
+}
+
 func (r *role) GetList(ctx context.Context, params entity.RoleParam) ([]entity.Role, *entity.Pagination, error) {
 	params.IncludePagination = true
 	params.QueryOption.IsActive = true
@@ -73,7 +82,26 @@ func (r *role) GetList(ctx context.Context, params entity.RoleParam) ([]entity.R
 	return roles, pg, nil
 }
 
+func (r *role) GetListAsAdmin(ctx context.Context, params entity.RoleParam) ([]entity.Role, *entity.Pagination, error) {
+	params.IncludePagination = true
+
+	roles, pg, err := r.role.GetList(ctx, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return roles, pg, nil
+}
+
 func (r *role) Update(ctx context.Context, updateParam entity.UpdateRoleParam, selectParam entity.RoleParam) error {
+	user, err := r.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	updateParam.UpdatedAt = null.TimeFrom(Now())
+	updateParam.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
+
 	return r.role.Update(ctx, updateParam, selectParam)
 }
 
@@ -90,4 +118,19 @@ func (r *role) Delete(ctx context.Context, selectParam entity.RoleParam) error {
 	}
 
 	return r.role.Update(ctx, deleteParam, selectParam)
+}
+
+func (r *role) Activate(ctx context.Context, selectParam entity.RoleParam) error {
+	user, err := r.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	activateParam := entity.UpdateRoleParam{
+		Status:    null.Int64From(1),
+		UpdatedAt: null.TimeFrom(Now()),
+		UpdatedBy: null.StringFrom(fmt.Sprintf("%v", user.User.ID)),
+	}
+
+	return r.role.Update(ctx, activateParam, selectParam)
 }

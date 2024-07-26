@@ -150,7 +150,7 @@ func (r *rest) UpdateUserProfile(ctx *gin.Context) {
 		return
 	}
 
-	err := r.uc.User.UpdateUserProfile(ctx.Request.Context(), updateParam)
+	err := r.uc.User.UpdateUserSelfProfile(ctx.Request.Context(), updateParam)
 	if err != nil {
 		r.httpRespError(ctx, err)
 		return

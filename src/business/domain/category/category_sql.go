@@ -43,7 +43,7 @@ func (c *category) getSQLCategory(ctx context.Context, params entity.CategoryPar
 		return category, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	row, err := c.db.Follower().QueryRow(ctx, "rCategoryByID", getCategory+queryExt, queryArgs...)
+	row, err := c.db.Follower().QueryRow(ctx, "rCategoryByID", readCategory+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return category, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	} else if errors.Is(err, sql.ErrNotFound) {
@@ -68,7 +68,7 @@ func (c *category) getSQLCategoryList(ctx context.Context, params entity.Categor
 		return categories, nil, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	rows, err := c.db.Follower().Query(ctx, "rListCategory", getCategory+queryExt, queryArgs...)
+	rows, err := c.db.Follower().Query(ctx, "rListCategory", readCategory+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return categories, nil, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	}
@@ -79,7 +79,7 @@ func (c *category) getSQLCategoryList(ctx context.Context, params entity.Categor
 		temp := entity.Category{}
 		if err := rows.StructScan(&temp); err != nil {
 			c.log.Error(ctx, errors.NewWithCode(codes.CodeSQLRowScan, err.Error()))
-			continue
+			return categories, nil, err
 		}
 		categories = append(categories, temp)
 	}
@@ -111,9 +111,14 @@ func (c *category) updateSQLCategory(ctx context.Context, updateParam entity.Upd
 		return errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	_, err = c.db.Leader().Exec(ctx, "uCategory", updateCategory+queryUpdate, args...)
+	res, err := c.db.Leader().Exec(ctx, "uCategory", updateCategory+queryUpdate, args...)
 	if err != nil {
 		return errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
+	}
+
+	rowCount, err := res.RowsAffected()
+	if err != nil || rowCount < 1 {
+		return errors.NewWithCode(codes.CodeSQLNoRowsAffected, "no rows affected")
 	}
 
 	c.log.Debug(ctx, fmt.Sprintf("successfully updated category: %v", updateParam))

@@ -13,11 +13,17 @@ import (
 )
 
 type Interface interface {
+	// Public
 	Create(ctx context.Context, req entity.CreateCategoryParam) (entity.Category, error)
 	Get(ctx context.Context, params entity.CategoryParam) (entity.Category, error)
 	GetList(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error)
 	Update(ctx context.Context, updateParam entity.UpdateCategoryParam, selectParam entity.CategoryParam) error
 	Delete(ctx context.Context, selectParam entity.CategoryParam) error
+
+	// Admin
+	GetAsAdmin(ctx context.Context, params entity.CategoryParam) (entity.Category, error)
+	GetListAsAdmin(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error)
+	Activate(ctx context.Context, selectParam entity.CategoryParam) error
 }
 
 type InitParam struct {
@@ -57,6 +63,11 @@ func (c *category) Create(ctx context.Context, req entity.CreateCategoryParam) (
 }
 
 func (c *category) Get(ctx context.Context, params entity.CategoryParam) (entity.Category, error) {
+	params.QueryOption.IsActive = true
+	return c.category.Get(ctx, params)
+}
+
+func (c *category) GetAsAdmin(ctx context.Context, params entity.CategoryParam) (entity.Category, error) {
 	return c.category.Get(ctx, params)
 }
 
@@ -72,8 +83,18 @@ func (c *category) GetList(ctx context.Context, params entity.CategoryParam) ([]
 	return categories, pg, nil
 }
 
-func (c *category) Update(ctx context.Context, updateParam entity.UpdateCategoryParam, selectParam entity.CategoryParam) error {
+func (c *category) GetListAsAdmin(ctx context.Context, params entity.CategoryParam) ([]entity.Category, *entity.Pagination, error) {
+	params.IncludePagination = true
 
+	categories, pg, err := c.category.GetList(ctx, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return categories, pg, nil
+}
+
+func (c *category) Update(ctx context.Context, updateParam entity.UpdateCategoryParam, selectParam entity.CategoryParam) error {
 	user, err := c.jwtAuth.GetUserAuthInfo(ctx)
 	if err != nil {
 		return err
@@ -98,4 +119,19 @@ func (c *category) Delete(ctx context.Context, selectParam entity.CategoryParam)
 	}
 
 	return c.category.Update(ctx, deleteParam, selectParam)
+}
+
+func (c *category) Activate(ctx context.Context, selectParam entity.CategoryParam) error {
+	user, err := c.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	activateParam := entity.UpdateCategoryParam{
+		Status:    null.Int64From(1),
+		UpdatedAt: null.TimeFrom(Now()),
+		UpdatedBy: null.StringFrom(fmt.Sprintf("%v", user.User.ID)),
+	}
+
+	return c.category.Update(ctx, activateParam, selectParam)
 }

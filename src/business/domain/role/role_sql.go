@@ -43,7 +43,7 @@ func (r *role) getSQLRole(ctx context.Context, params entity.RoleParam) (entity.
 		return result, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	row, err := r.db.Follower().QueryRow(ctx, "rRoleByID", getRole+queryExt, queryArgs...)
+	row, err := r.db.Follower().QueryRow(ctx, "rRoleByID", readRole+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return result, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	} else if errors.Is(err, sql.ErrNotFound) {
@@ -68,7 +68,7 @@ func (r *role) getSQLRoleList(ctx context.Context, params entity.RoleParam) ([]e
 		return results, nil, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	rows, err := r.db.Follower().Query(ctx, "rListRole", getRole+queryExt, queryArgs...)
+	rows, err := r.db.Follower().Query(ctx, "rListRole", readRole+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return results, nil, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	}
@@ -79,7 +79,8 @@ func (r *role) getSQLRoleList(ctx context.Context, params entity.RoleParam) ([]e
 		temp := entity.Role{}
 		if err := rows.StructScan(&temp); err != nil {
 			r.log.Error(ctx, errors.NewWithCode(codes.CodeSQLRowScan, err.Error()))
-			continue
+			// Need discussiion, ini jadinya mau bagaimana
+			return results, nil, err
 		}
 		results = append(results, temp)
 	}

@@ -18,6 +18,7 @@ type Interface interface {
 	GetList(ctx context.Context, params entity.TaskParam) ([]entity.Task, *entity.Pagination, error)
 	Update(ctx context.Context, updateParam entity.UpdateTaskParam, selectParam entity.TaskParam) error
 	Delete(ctx context.Context, selectParam entity.TaskParam) error
+	Activate(ctx context.Context, selectParam entity.TaskParam) error
 }
 
 type InitParam struct {
@@ -66,6 +67,7 @@ func (t *task) Get(ctx context.Context, params entity.TaskParam) (entity.Task, e
 	}
 
 	// If the user id is not admin, then filter for that user
+	// TODO: Change this to use role id instead of user id
 	if user.User.ID != entity.RoleIdSuperAdmin {
 		params.UserId = null.Int64From(user.User.ID)
 	}
@@ -79,17 +81,18 @@ func (t *task) GetList(ctx context.Context, params entity.TaskParam) ([]entity.T
 
 	user, err := t.jwtAuth.GetUserAuthInfo(ctx)
 	if err != nil {
-		return []entity.Task{}, &entity.Pagination{}, err
+		return []entity.Task{}, nil, err
 	}
 
 	// If the user id is not admin, then filter for that user
+	// TODO: Change this to use role id instead of user id
 	if user.User.ID != entity.RoleIdSuperAdmin {
 		params.UserId = null.Int64From(user.User.ID)
 	}
 
 	tasks, pg, err := t.task.GetList(ctx, params)
 	if err != nil {
-		return nil, nil, err
+		return []entity.Task{}, nil, err
 	}
 
 	return tasks, pg, nil
@@ -120,4 +123,19 @@ func (t *task) Delete(ctx context.Context, selectParam entity.TaskParam) error {
 	}
 
 	return t.task.Update(ctx, deleteParam, selectParam)
+}
+
+func (t *task) Activate(ctx context.Context, selectParam entity.TaskParam) error {
+	user, err := t.jwtAuth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	activateParam := entity.UpdateTaskParam{
+		Status:    null.Int64From(1),
+		UpdatedAt: null.TimeFrom(Now()),
+		UpdatedBy: null.StringFrom(fmt.Sprintf("%v", user.User.ID)),
+	}
+
+	return t.task.Update(ctx, activateParam, selectParam)
 }
