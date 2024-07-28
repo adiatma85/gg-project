@@ -4,7 +4,7 @@ const (
 	createTask = `INSERT INTO task (fk_user_id, fk_category_id, title, priority, task_status, periodic, due_time, created_by, updated_by)
 	VALUES (:fk_user_id, :fk_category_id, :title, :priority, :task_status, :periodic, :due_time, :created_by, :updated_by)`
 
-	getTask = `
+	readTask = `
 		SELECT
 			id,
 			fk_user_id,

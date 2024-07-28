@@ -43,7 +43,7 @@ func (t *task) getSQLTask(ctx context.Context, params entity.TaskParam) (entity.
 		return result, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	row, err := t.db.Follower().QueryRow(ctx, "rTaskByID", getTask+queryExt, queryArgs...)
+	row, err := t.db.Follower().QueryRow(ctx, "rTaskByID", readTask+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return result, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	} else if errors.Is(err, sql.ErrNotFound) {
@@ -68,7 +68,7 @@ func (t *task) getSQLTaskList(ctx context.Context, params entity.TaskParam) ([]e
 		return results, nil, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	rows, err := t.db.Follower().Query(ctx, "rListTask", getTask+queryExt, queryArgs...)
+	rows, err := t.db.Follower().Query(ctx, "rListTask", readTask+queryExt, queryArgs...)
 	if err != nil && !errors.Is(err, sql.ErrNotFound) {
 		return results, nil, errors.NewWithCode(codes.CodeSQLRead, err.Error())
 	}
@@ -79,7 +79,7 @@ func (t *task) getSQLTaskList(ctx context.Context, params entity.TaskParam) ([]e
 		temp := entity.Task{}
 		if err := rows.StructScan(&temp); err != nil {
 			t.log.Error(ctx, errors.NewWithCode(codes.CodeSQLRowScan, err.Error()))
-			continue
+			return results, nil, err
 		}
 		results = append(results, temp)
 	}
@@ -111,9 +111,14 @@ func (t *task) updateSQLTask(ctx context.Context, updateParam entity.UpdateTaskP
 		return errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	_, err = t.db.Leader().Exec(ctx, "uTask", updateTask+queryUpdate, args...)
+	res, err := t.db.Leader().Exec(ctx, "uTask", updateTask+queryUpdate, args...)
 	if err != nil {
 		return errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
+	}
+
+	rowCount, err := res.RowsAffected()
+	if err != nil || rowCount < 1 {
+		return errors.NewWithCode(codes.CodeSQLNoRowsAffected, "no rows affected")
 	}
 
 	t.log.Debug(ctx, fmt.Sprintf("successfully updated task: %v", updateParam))
