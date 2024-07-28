@@ -112,9 +112,14 @@ func (r *role) updateSQLRole(ctx context.Context, updateParam entity.UpdateRoleP
 		return errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
 	}
 
-	_, err = r.db.Leader().Exec(ctx, "uRole", updateRole+queryUpdate, args...)
+	res, err := r.db.Leader().Exec(ctx, "uRole", updateRole+queryUpdate, args...)
 	if err != nil {
 		return errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
+	}
+
+	rowCount, err := res.RowsAffected()
+	if err != nil || rowCount < 1 {
+		return errors.NewWithCode(codes.CodeSQLNoRowsAffected, "no rows affected")
 	}
 
 	r.log.Debug(ctx, fmt.Sprintf("successfully updated role: %v", updateParam))
