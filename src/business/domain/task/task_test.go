@@ -1,4 +1,4 @@
-package role
+package task
 
 import (
 	"context"
@@ -20,11 +20,10 @@ import (
 	mock_log "github.com/adiatma85/own-go-sdk/tests/mock/log"
 	mock_json "github.com/adiatma85/own-go-sdk/tests/mock/parser"
 	"github.com/stretchr/testify/assert"
-
 	"go.uber.org/mock/gomock"
 )
 
-func Test_role_Create(t *testing.T) {
+func Test_task_Create(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -38,24 +37,24 @@ func Test_role_Create(t *testing.T) {
 	// Type in here
 	type args struct {
 		ctx         context.Context
-		createParam entity.CreateRoleParam
+		createParam entity.CreateTaskParam
 	}
 
 	// Mock in here
-	mockCreateParam := entity.CreateRoleParam{
-		Name: "Nama Role yang panjang dan lebar",
+	mockCreateParam := entity.CreateTaskParam{
+		Title: "Nama task yang panjang dan lebar",
 	}
 
-	query := regexp.QuoteMeta(`INSERT INTO role (name, type, rank, created_by, updated_by)
-	VALUES (?, ?, ?, ?, ?)`)
-	queryGet := regexp.QuoteMeta(readRole)
+	query := regexp.QuoteMeta(`INSERT INTO task (fk_user_id, fk_category_id, title, priority, task_status, periodic, due_time, created_by, updated_by)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+	queryGet := regexp.QuoteMeta(readTask)
 
 	// Test cases in here
 	tests := []struct {
 		name        string
 		args        args
 		prepSqlMock func() (*sql.DB, error)
-		want        entity.Role
+		want        entity.Task
 		wantErr     bool
 	}{
 		{
@@ -68,11 +67,11 @@ func Test_role_Create(t *testing.T) {
 				sqlServer, _, err := sqlmock.New()
 				return sqlServer, err
 			},
-			want:    entity.Role{},
+			want:    entity.Task{},
 			wantErr: true,
 		},
 		{
-			name: "cannot exec role",
+			name: "cannot exec task",
 			args: args{
 				ctx:         context.Background(),
 				createParam: mockCreateParam,
@@ -81,16 +80,16 @@ func Test_role_Create(t *testing.T) {
 				sqlServer, sqlMock, err := sqlmock.New()
 				sqlMock.ExpectBegin()
 
-				sqlMock.ExpectExec(query).WillReturnError(errors.NewWithCode(codes.CodeSQL, "cannot create role"))
+				sqlMock.ExpectExec(query).WillReturnError(errors.NewWithCode(codes.CodeSQL, "cannot create task"))
 				sqlMock.ExpectRollback()
 
 				return sqlServer, err
 			},
-			want:    entity.Role{},
+			want:    entity.Task{},
 			wantErr: true,
 		},
 		{
-			name: "role no new row",
+			name: "task no new row",
 			args: args{
 				ctx:         context.Background(),
 				createParam: mockCreateParam,
@@ -102,7 +101,7 @@ func Test_role_Create(t *testing.T) {
 				sqlMock.ExpectRollback()
 				return sqlServer, err
 			},
-			want:    entity.Role{},
+			want:    entity.Task{},
 			wantErr: true,
 		},
 		{
@@ -119,7 +118,7 @@ func Test_role_Create(t *testing.T) {
 				sqlMock.ExpectRollback()
 				return sqlServer, err
 			},
-			want: entity.Role{
+			want: entity.Task{
 				ID: 1,
 			},
 			wantErr: true,
@@ -139,17 +138,17 @@ func Test_role_Create(t *testing.T) {
 				// Add new rows
 				row := sqlMock.NewRows([]string{
 					"id",
-					"name",
+					"title",
 				})
-				row.AddRow("1", "Nama Role yang panjang dan lebar")
+				row.AddRow("1", "Nama task yang panjang dan lebar")
 				sqlMock.ExpectQuery(queryGet).WithArgs(1).WillReturnRows(row)
 
 				sqlMock.ExpectRollback()
 				return sqlServer, err
 			},
-			want: entity.Role{
-				ID:   1,
-				Name: "Nama Role yang panjang dan lebar",
+			want: entity.Task{
+				ID:    1,
+				Title: "Nama task yang panjang dan lebar",
 			},
 			wantErr: false,
 		},
@@ -193,7 +192,7 @@ func Test_role_Create(t *testing.T) {
 	}
 }
 
-func Test_role_Get(t *testing.T) {
+func Test_task_Get(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -207,18 +206,18 @@ func Test_role_Get(t *testing.T) {
 	// Type in here
 	type args struct {
 		ctx    context.Context
-		params entity.RoleParam
+		params entity.TaskParam
 	}
 
 	// Mock in here
 	now := time.Now()
-	query := regexp.QuoteMeta(readRole)
+	query := regexp.QuoteMeta(readTask)
 
-	mockParam := entity.RoleParam{
+	mockParam := entity.TaskParam{
 		ID: null.Int64From(1),
 	}
 
-	sampleResult := entity.Role{
+	sampleResult := entity.Task{
 		ID:        1,
 		CreatedAt: null.TimeFrom(now),
 		CreatedBy: null.StringFrom("test"),
@@ -231,7 +230,7 @@ func Test_role_Get(t *testing.T) {
 		name        string
 		args        args
 		prepSqlMock func() (*sql.DB, error)
-		want        entity.Role
+		want        entity.Task
 		wantErr     bool
 	}{
 		{
@@ -247,7 +246,7 @@ func Test_role_Get(t *testing.T) {
 				return sqlServer, err
 			},
 			wantErr: true,
-			want:    entity.Role{},
+			want:    entity.Task{},
 		},
 		{
 			name: "error struct scan",
@@ -265,7 +264,7 @@ func Test_role_Get(t *testing.T) {
 				return sqlServer, err
 			},
 			wantErr: true,
-			want:    entity.Role{},
+			want:    entity.Task{},
 		},
 		{
 			name: "all good",
@@ -324,7 +323,7 @@ func Test_role_Get(t *testing.T) {
 	}
 }
 
-func Test_role_GetList(t *testing.T) {
+func Test_task_GetList(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -338,17 +337,17 @@ func Test_role_GetList(t *testing.T) {
 	// Type in here
 	type args struct {
 		ctx    context.Context
-		params entity.RoleParam
+		params entity.TaskParam
 	}
 
 	// Mock in here
 	now := time.Now()
 	queryExt := " WHERE 1=1 AND id=? LIMIT 0, 10;"
-	query := regexp.QuoteMeta(readRole + queryExt)
+	query := regexp.QuoteMeta(readTask + queryExt)
 	queryCountExt := " WHERE 1=1 AND id=?;"
-	queryCount := regexp.QuoteMeta(readRoleCount + queryCountExt)
+	queryCount := regexp.QuoteMeta(readTaskCount + queryCountExt)
 
-	mockParams := entity.RoleParam{
+	mockParams := entity.TaskParam{
 		ID: null.Int64From(1),
 		PaginationParam: entity.PaginationParam{
 			IncludePagination: true,
@@ -368,7 +367,7 @@ func Test_role_GetList(t *testing.T) {
 		name        string
 		args        args
 		prepSqlMock func() (*sql.DB, error)
-		want        []entity.Role
+		want        []entity.Task
 		want1       *entity.Pagination
 		wantErr     bool
 	}{
@@ -380,10 +379,10 @@ func Test_role_GetList(t *testing.T) {
 			},
 			prepSqlMock: func() (*sql.DB, error) {
 				sqlServer, sqlMock, err := sqlmock.New()
-				sqlMock.ExpectQuery(query).WillReturnError(fmt.Errorf("failed to get list of role"))
+				sqlMock.ExpectQuery(query).WillReturnError(fmt.Errorf("failed to get list of task"))
 				return sqlServer, err
 			},
-			want:    []entity.Role{},
+			want:    []entity.Task{},
 			want1:   nil,
 			wantErr: true,
 		},
@@ -404,7 +403,7 @@ func Test_role_GetList(t *testing.T) {
 				sqlMock.ExpectQuery(queryCount).WillReturnRows(rowCount)
 				return sqlServer, err
 			},
-			want:    []entity.Role{},
+			want:    []entity.Task{},
 			want1:   nil,
 			wantErr: true,
 		},
@@ -425,7 +424,7 @@ func Test_role_GetList(t *testing.T) {
 				sqlMock.ExpectQuery(queryCount).WillReturnRows(rowCount)
 				return sqlServer, err
 			},
-			want: []entity.Role{
+			want: []entity.Task{
 				{
 					ID:        1,
 					CreatedAt: null.TimeFrom(now),
@@ -481,7 +480,7 @@ func Test_role_GetList(t *testing.T) {
 	}
 }
 
-func Test_role_Update(t *testing.T) {
+func Test_task_Update(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -495,22 +494,22 @@ func Test_role_Update(t *testing.T) {
 	// Type in here
 	type args struct {
 		ctx         context.Context
-		updateParam entity.UpdateRoleParam
-		selectParam entity.RoleParam
+		updateParam entity.UpdateTaskParam
+		selectParam entity.TaskParam
 	}
 
 	// Mock in here
-	queryUpdate := regexp.QuoteMeta("UPDATE role SET name=?, updated_by=? WHERE 1=1 AND status=1 AND id=?")
+	queryUpdate := regexp.QuoteMeta("UPDATE task SET title=?, updated_by=? WHERE 1=1 AND status=1 AND id=?")
 
-	selectParamSample := entity.RoleParam{
+	selectParamSample := entity.TaskParam{
 		ID: null.Int64From(1),
 		QueryOption: query.Option{
 			IsActive: true,
 		},
 	}
 
-	updateParamSample := entity.UpdateRoleParam{
-		Name:      "Edit Nama",
+	updateParamSample := entity.UpdateTaskParam{
+		Title:     "Edit Nama",
 		UpdatedBy: null.StringFrom("1"),
 	}
 
@@ -536,7 +535,7 @@ func Test_role_Update(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "no role updated",
+			name: "no task updated",
 			args: args{
 				ctx:         context.Background(),
 				updateParam: updateParamSample,
@@ -550,7 +549,7 @@ func Test_role_Update(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "update role 0 rows affected",
+			name: "update task 0 rows affected",
 			args: args{
 				ctx:         context.Background(),
 				updateParam: updateParamSample,
@@ -564,7 +563,7 @@ func Test_role_Update(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "update role success",
+			name: "update task success",
 			args: args{
 				ctx:         context.Background(),
 				updateParam: updateParamSample,
