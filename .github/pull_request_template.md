@@ -11,5 +11,6 @@
 - [ ] new features
 - [ ] bugfix
 - [ ] code improvements
+- [ ] chore
 - [ ] hotfix
 - [ ] breaking changes
