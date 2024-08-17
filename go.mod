@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/adiatma85/dark-gin-swagger v1.1.0
-	github.com/adiatma85/own-go-sdk v0.1.16
+	github.com/adiatma85/own-go-sdk v0.1.17
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/files v1.0.1
