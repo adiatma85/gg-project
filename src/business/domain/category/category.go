@@ -41,16 +41,16 @@ func Init(param InitParam) Interface {
 	return c
 }
 
-func (c *category) Create(ctx context.Context, userParam entity.CreateCategoryParam) (entity.Category, error) {
+func (c *category) Create(ctx context.Context, createParam entity.CreateCategoryParam) (entity.Category, error) {
 	category := entity.Category{}
 
-	tx, err := c.db.Leader().BeginTx(ctx, "txcUser", sql.TxOptions{})
+	tx, err := c.db.Leader().BeginTx(ctx, "txcCategory", sql.TxOptions{})
 	if err != nil {
 		return category, errors.NewWithCode(codes.CodeSQLTxBegin, err.Error())
 	}
 	defer tx.Rollback()
 
-	tx, category, err = c.createSQLCategory(tx, userParam)
+	tx, category, err = c.createSQLCategory(tx, createParam)
 	if err != nil {
 		return category, err
 	}
