@@ -168,7 +168,7 @@ func (r *rest) Run() {
 			r.log.Error(ctx, fmt.Sprintf("Serving HTTP error: %s", err.Error()))
 		}
 	}()
-	r.log.Info(ctx, fmt.Sprintf("Listening and Serving HTTP on %s", srv.Addr))
+	r.log.Info(ctx, fmt.Sprintf("Listening and Serving HTTP on %s", fmt.Sprintf("http://%v%v", r.conf.Host, srv.Addr)))
 
 	// Listen for the interrupt signal.
 	<-ctx.Done()
